@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 
-namespace Melkov.DI
+namespace Code.DI
 {
 	public class Graph
 	{

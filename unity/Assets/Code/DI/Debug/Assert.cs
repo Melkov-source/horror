@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Melkov.DI.Debug
+namespace Code.DI
 {
     internal static class Assert
     {

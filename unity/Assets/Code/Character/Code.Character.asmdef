@@ -1,7 +1,11 @@
 {
-    "name": "DI",
-    "rootNamespace": "Melkov.DI",
-    "references": [],
+    "name": "Code.Character",
+    "rootNamespace": "",
+    "references": [
+        "GUID:37b8a62771e29ae499f6edcecc992270",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:08463c1320dc64f4ba93da62f705c147"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

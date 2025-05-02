@@ -1,4 +1,4 @@
-﻿namespace Melkov.DI
+﻿namespace Code.DI
 {
     public enum BIND_SCOPE : byte
     {

@@ -1,10 +1,10 @@
 {
     "name": "DI.Tests",
-    "rootNamespace": "Melkov.DI.Tests",
+    "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "DI"
+        "Code.DI"
     ],
     "includePlatforms": [
         "Editor"

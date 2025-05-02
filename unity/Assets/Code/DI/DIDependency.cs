@@ -1,7 +1,6 @@
 ﻿using System;
-using Melkov.DI;
 
-namespace Melkov.DI
+namespace Code.DI
 {
     public interface IDIDependency
     {
@@ -42,7 +41,7 @@ namespace Melkov.DI
         {
             return this;
         }
-        
+
         public void AsSingleton()
         {
             bind_info.SetScope(BIND_SCOPE.SINGLETON);

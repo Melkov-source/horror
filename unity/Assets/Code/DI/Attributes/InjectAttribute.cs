@@ -1,6 +1,6 @@
 ﻿using UnityEngine.Scripting;
 
-namespace Melkov.DI
+namespace Code.DI
 {
     public class InjectAttribute : PreserveAttribute
     {

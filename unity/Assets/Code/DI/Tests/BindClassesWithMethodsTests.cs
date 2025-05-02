@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace Melkov.DI.Tests
+namespace Code.DI.Tests
 {
     public class BindClassesWithMethodsTests
     {

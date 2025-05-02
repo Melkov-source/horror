@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
-using Melkov.DI.Debug;
 
 /*
  * TODO: Кеширование
@@ -11,14 +10,26 @@ using Melkov.DI.Debug;
  * 2. Кешировать аттрибуты для членов типа
  * 3. Сделать кастомные обработчики для получения аттрибутов и членов
  */
-namespace Melkov.DI
+namespace Code.DI
 {
     public class Container
     {
         private readonly Graph _graph = new();
-        private readonly List<IDIDependency> _dependencies = new ();
-        
-        private readonly Dictionary<Type, object> _instances = new();
+        private readonly List<IDIDependency> _dependencies;
+
+        private readonly Dictionary<Type, object> _instances;
+
+        public Container()
+        {
+            _dependencies = new List<IDIDependency>();
+            _instances = new Dictionary<Type, object>();
+            
+            var type = typeof(Container);
+            var dependency = new DIDependency<Container>(type);
+            
+            _dependencies.Add(dependency);
+            _instances.Add(type, this);
+        }
         
         public IDIDependency<TType> Bind<TType>()
         {
@@ -45,6 +56,11 @@ namespace Melkov.DI
                 object instance;
                 
                 var dependency = sort_dependencies[index_1];
+
+                if (_instances.ContainsKey(dependency))
+                {
+                    continue;
+                }
                 
                 Assert.This
                 (
@@ -71,13 +87,13 @@ namespace Melkov.DI
             return result as TType;
         }
 
-        public void Inject([NotNull] object instance)
+        public void Inject([NotNull] object instance, params object[] args)
         {
             var type = instance.GetType();
 
             var inject_members = Graph.GetInjectMembersByType(type, false);
         
-            InjectInternal(in instance, in inject_members);
+            InjectInternal(in instance, in inject_members, args);
         }
 
         public object Activate(Type type)
@@ -130,8 +146,17 @@ namespace Melkov.DI
             return Activate(type) as TType;
         }
     
-        private void InjectInternal([NotNull] in object instance, [NotNull] in Dictionary<MemberTypes, List<MemberInfo>> inject_members)
+        private void InjectInternal([NotNull] in object instance, [NotNull] in Dictionary<MemberTypes, List<MemberInfo>> inject_members, params object[] custom_args)
         {
+            var custom_instances = new Dictionary<Type, object>();
+
+            foreach (var arg in custom_args)
+            {
+                var type = arg.GetType();
+                
+                custom_instances[type] = arg;
+            }
+            
             var priorities = new Dictionary<byte, MemberTypes>()
             {
                 { 0, MemberTypes.Method },
@@ -158,7 +183,7 @@ namespace Melkov.DI
                         {
                             var method = (MethodBase)member;
 
-                            var args = GetMethodArgs(method);
+                            var args = GetMethodArgs(method, custom_args);
                         
                             method.Invoke(instance, args);
                             break;
@@ -171,7 +196,11 @@ namespace Melkov.DI
 
                             if (_instances.TryGetValue(field.FieldType, out var value) == false)
                             {
-                                throw new Exception($"Unable to resolve parameter type {field.FieldType} from instance: {instance}");
+                                if (custom_instances.TryGetValue(field.FieldType, out value) == false)
+                                {
+                                    throw new Exception(
+                                        $"Unable to resolve parameter type {field.FieldType} from instance: {instance}");
+                                }
                             }
                         
                             field.SetValue(instance, value);
@@ -192,8 +221,17 @@ namespace Melkov.DI
         }
     
         [NotNull]
-        private object[] GetMethodArgs([NotNull] MethodBase method)
+        private object[] GetMethodArgs([NotNull] MethodBase method, params object[] custom_args)
         {
+            var custom_instances = new Dictionary<Type, object>();
+
+            foreach (var arg in custom_args)
+            {
+                var type = arg.GetType();
+                
+                custom_instances[type] = arg;
+            }
+            
             var parameters = method.GetParameters();
                         
             var args = new object[parameters.Length];
@@ -206,7 +244,10 @@ namespace Melkov.DI
 
                 if (_instances.TryGetValue(parameter_type, out var value) == false)
                 {
-                    throw new Exception($"Unable to resolve parameter type {parameter_type}");
+                    if (custom_instances.TryGetValue(parameter_type, out value) == false)
+                    {
+                        throw new Exception($"Unable to resolve parameter type {parameter_type}");
+                    }
                 }
                             
                 args[index_3] = value;

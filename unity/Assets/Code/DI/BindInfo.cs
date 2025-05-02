@@ -1,7 +1,6 @@
 ﻿using System;
-using Melkov.DI;
 
-namespace Melkov.DI
+namespace Code.DI
 {
     public class BindInfo
     {
