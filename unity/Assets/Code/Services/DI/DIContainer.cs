@@ -42,13 +42,30 @@ namespace Code.DI
             var dependency = new DIDependency<TType>(type);
             
             _dependencies.Add(dependency);
-            _graph.Register(type);
 
             return dependency;
         }
         
         public void Build()
         {
+            _dependencies.ForEach(d =>
+            {
+                if (d.bind_info.Instance != null)
+                {
+                    _graph.Register(d.bind_info);
+                    
+                    _instances[d.bind_info.Type] = d.bind_info.Instance;
+                }
+            });
+            
+            _dependencies.ForEach(d =>
+            {
+                if (d.bind_info.Instance == null)
+                {
+                    _graph.Register(d.bind_info);
+                }
+            });
+            
             var binds = _dependencies
                 .Select(d => d.bind_info)
                 .ToDictionary(b => b.Type, b => b);

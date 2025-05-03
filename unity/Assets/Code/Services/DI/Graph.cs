@@ -11,7 +11,22 @@ namespace Code.DI
 		private readonly Dictionary<Type, HashSet<Type>> _dependencies = new();
 		private readonly HashSet<Type> _types = new();
 
-		public void Register(Type type)
+		private readonly HashSet<Type> _types_instances = new();
+
+		public void Register(BindInfo bind_info)
+		{
+			if (bind_info.Instance != null)
+			{
+				_types_instances.Add(bind_info.Type);
+				return;
+			}
+			
+			var type = bind_info.Type;
+
+			RegisterInternal(type);
+		}
+
+		private void RegisterInternal(Type type)
 		{
 			if (_types.Add(type) == false)
 			{
@@ -277,11 +292,16 @@ namespace Code.DI
 
 		private void RegisterType(Type type, in HashSet<Type> dependencies)
 		{
+			if (_types_instances.Contains(type))
+			{
+				return;
+			}
+			
 			dependencies.Add(type);
 
 			if (_types.Contains(type) == false)
 			{
-				Register(type);
+				RegisterInternal(type);
 			}
 		}
 	}
