@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Code.Input;
+using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -8,14 +9,18 @@ namespace Code.App
 	public class Application
 	{
 		private readonly ScopeDirector _director;
+		private readonly InputSystem _input;
 		
-		public Application(ScopeDirector director)
+		public Application(ScopeDirector director, InputSystem input)
 		{
 			_director = director;
+			_input = input;
 		}
 
 		public void Main()
 		{
+			_input.Enable();
+			
 			_director
 				.ToScopeAsync(AppScope.MENU)
 				.Forget();
