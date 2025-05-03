@@ -1,30 +1,42 @@
-﻿using Code.DI;
-using Code.Game;
-using Code.Input;
+﻿using Cysharp.Threading.Tasks;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Code.App
 {
-	public static class Application
+	[UsedImplicitly]
+	public class Application
 	{
-		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-		public static void Run()
+		private readonly ScopeDirector _director;
+		
+		public Application(ScopeDirector director)
 		{
-			var container = new Container();
+			_director = director;
+		}
 
-			container
-				.Bind<InputSystem>()
-				.AsSingleton();
+		public void Main()
+		{
+			_director
+				.ToScopeAsync(AppScope.MENU)
+				.Forget();
+		}
+		
+		public class MonoHeart : MonoBehaviour
+		{
+			public void Update()
+			{
 			
-			container
-				.Bind<GameManager>()
-				.AsSingleton();
-			
-			container.Build();
+			}
 
-			var game = container.Resolve<GameManager>()!;
+			public void FixedUpdate()
+			{
 			
-			game.Start();
+			}
+
+			public void LateUpdate()
+			{
+			
+			}
 		}
 	}
 }
