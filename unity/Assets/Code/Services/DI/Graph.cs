@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace Code.DI
 {
-	public class Graph
+	public class Graph : IDisposable
 	{
 		private readonly Dictionary<Type, HashSet<Type>> _dependencies = new();
 		private readonly HashSet<Type> _types = new();
@@ -206,6 +206,13 @@ namespace Code.DI
 			var message = "Cycle Types: " + string.Join(", ", cyclic_types.Select(t => t.FullName));
 
 			throw new InvalidOperationException(message);
+		}
+		
+		public void Dispose()
+		{
+			_types.Clear();
+			_types_instances.Clear();
+			_dependencies.Clear();
 		}
 
 		[NotNull]

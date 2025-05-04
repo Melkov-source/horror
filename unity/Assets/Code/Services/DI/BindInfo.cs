@@ -1,26 +1,37 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Code.DI
 {
     public class BindInfo
     {
         public Type Type { get; }
-        public BIND_SCOPE Scope { get; private set; } = BIND_SCOPE.TRANSIENT;
+        [CanBeNull] public Type TypeImpl { get; }
+        
         public object Instance { get; private set; }
+        public BIND_SCOPE Scope { get; private set; }
 
-        public BindInfo(Type type)
+        public Func<object> FactoryMethod { get; private set; }
+
+        public BindInfo(Type type, Type impl)
         {
             Type = type;
-        }
-
-        public void SetScope(BIND_SCOPE scope)
-        {
-            Scope = scope;
+            TypeImpl = impl;
         }
 
         public void SetInstance(object instance)
         {
             Instance = instance;
+        }
+
+        public void SetFactoryMethod(Func<object> factory)
+        {
+            FactoryMethod = factory;
+        }
+
+        public void SetScope(BIND_SCOPE scope)
+        {
+            Scope = scope;
         }
     }
 }

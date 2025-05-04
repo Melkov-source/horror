@@ -2,7 +2,7 @@
 
 namespace Code.PanelManager
 {
-	public interface IPanelManager
+	public interface IPanelManager : IDisposable
 	{
 		public PanelDispatcher dispatcher { get; }
 		public TPanelController LoadPanel<TPanelController>() where TPanelController : IPanelController;

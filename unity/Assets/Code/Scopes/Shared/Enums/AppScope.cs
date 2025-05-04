@@ -1,4 +1,4 @@
-﻿namespace Code.App
+﻿namespace Code.Shared
 {
 	public enum AppScope
 	{

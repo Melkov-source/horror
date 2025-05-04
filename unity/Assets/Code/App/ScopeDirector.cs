@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 namespace Code.App
 {
 	[UsedImplicitly]
-	public class ScopeDirector
+	public class ScopeDirector : IScopeDirector
 	{
 		private readonly Application.MonoHeart _heart;
 		private readonly DIContainer _app_container;

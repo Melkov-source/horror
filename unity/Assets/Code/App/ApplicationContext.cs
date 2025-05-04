@@ -1,6 +1,7 @@
 ﻿using Code.DI;
 using Code.Input;
 using Code.PanelManager;
+using Code.Shared;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace Code.App
 				.AsSingleton();
 			
 			container
-				.Bind<ScopeDirector>()
+				.Bind<IScopeDirector, ScopeDirector>()
 				.AsSingleton();
 			
 			container
@@ -38,18 +39,6 @@ namespace Code.App
 			container
 				.Bind<Application.MonoHeart>()
 				.FromInstance(mono_heart)
-				.AsSingleton();
-			
-			var panel_manager = new PanelManager.PanelManager
-			(
-				new PanelControllerFactory(),
-				new AddressablesPanelFactory(),
-				null
-			);
-			
-			container
-				.Bind<PanelManager.PanelManager>()
-				.FromInstance(panel_manager)
 				.AsSingleton();
 		}
 	}

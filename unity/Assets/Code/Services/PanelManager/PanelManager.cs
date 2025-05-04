@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Code.PanelManager.Interfaces;
 using Code.Utils;
+using UnityEngine;
 
 namespace Code.PanelManager
 {
@@ -126,6 +128,22 @@ namespace Code.PanelManager
             processor.Unload();
 
             _panels_cashed.Remove(processor.Hash);
+        }
+
+        public void Dispose()
+        {
+            var panels = _panels_cashed.Values.ToArray();
+
+            foreach (var panel in panels)
+            {
+                panel.Release();
+            }
+            
+            _panels_cashed.Clear();
+            
+            UnityEngine.Object.Destroy(dispatcher.gameObject);
+            
+            Debug.Log("Dispose Panel Manager");
         }
     }
 }

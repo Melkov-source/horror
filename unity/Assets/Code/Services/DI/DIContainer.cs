@@ -33,7 +33,7 @@ namespace Code.DI
             _instances = new Dictionary<Type, object>();
             
             var type = typeof(DIContainer);
-            var dependency = new DIDependency<DIContainer>(type);
+            var dependency = new DIDependency<DIContainer>(type, null);
             
             dependency
                 .FromInstance(this)
@@ -46,10 +46,22 @@ namespace Code.DI
         {
             var type = typeof(TType);
             
-            var dependency = new DIDependency<TType>(type);
+            var dependency = new DIDependency<TType>(type, null);
             
             _dependencies.Add(dependency);
 
+            return dependency;
+        }
+
+        public IDIDependency<TContract> Bind<TContract, TImpl>() where TImpl : TContract
+        {
+            var type = typeof(TContract);
+            var type_impl = typeof(TImpl);
+            
+            var dependency = new DIDependency<TContract>(type, type_impl);
+            
+            _dependencies.Add(dependency);
+            
             return dependency;
         }
         
@@ -109,7 +121,16 @@ namespace Code.DI
                 }
                 else
                 {
-                    instance = Activate(dependency);
+                    var info = binds[dependency];
+
+                    if (info.TypeImpl != null)
+                    {
+                        instance = Activate(info.TypeImpl);
+                    }
+                    else
+                    {
+                        instance = Activate(dependency);
+                    }
                 }
                     
                 _instances[dependency] = instance;
@@ -200,7 +221,19 @@ namespace Code.DI
         
         public void Dispose()
         {
+            foreach (var instance in _instances.Values)
+            {
+                if (instance == this)
+                {
+                    continue;
+                }
+                
+                (instance as IDisposable)?.Dispose();
+            }
             
+            _instances.Clear();
+            _dependencies.Clear();
+            _graph.Dispose();
         }
     
         private void InjectInternal([NotNull] in object instance, [NotNull] in Dictionary<MemberTypes, List<MemberInfo>> inject_members, params object[] custom_args)

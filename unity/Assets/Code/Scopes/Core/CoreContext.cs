@@ -1,4 +1,5 @@
 ﻿using Code.DI;
+using Code.PanelManager;
 using JetBrains.Annotations;
 
 namespace Code.Core
@@ -10,6 +11,18 @@ namespace Code.Core
 		{
 			container
 				.Bind<CoreScope>()
+				.AsSingleton();
+			
+			var panel_manager = new PanelManager.PanelManager
+			(
+				new DIPanelControllerFactory(container),
+				new AddressablesPanelFactory(),
+				null
+			);
+			
+			container
+				.Bind<PanelManager.PanelManager>()
+				.FromInstance(panel_manager)
 				.AsSingleton();
 		}
 	}

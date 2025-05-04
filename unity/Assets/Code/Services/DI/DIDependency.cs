@@ -25,20 +25,20 @@ namespace Code.DI
     {
         public BindInfo bind_info { get; }
 
-        public DIDependency(Type type)
+        public DIDependency(Type type, Type impl)
         {
-            bind_info = new BindInfo(type);
+            bind_info = new BindInfo(type, impl);
         }
-        
+
         public IDIDependencySetScope<TDependency> FromInstance(TDependency instance)
         {
             bind_info.SetInstance(instance);
-
             return this;
         }
 
         public IDIDependencySetScope<TDependency> FromMethod(Func<TDependency> method)
         {
+            bind_info.SetFactoryMethod(() => method());
             return this;
         }
 
