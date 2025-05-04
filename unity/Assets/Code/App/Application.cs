@@ -1,4 +1,5 @@
-﻿using Code.Input;
+﻿using Code.DI;
+using Code.Input;
 using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace Code.App
 		private readonly ScopeDirector _director;
 		private readonly InputSystem _input;
 		
-		public Application(ScopeDirector director, InputSystem input)
+		public Application(ScopeDirector director, InputSystem input, DIContainer container)
 		{
 			_director = director;
 			_input = input;

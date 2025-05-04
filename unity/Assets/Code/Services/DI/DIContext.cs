@@ -4,19 +4,18 @@ namespace Code.DI
 {
 	public static class DIContext
 	{
-		public static TResolve Register<TContext, TResolve>() 
-			where TContext : IDIContext 
+		public static (DIContainer container, TResolve instance) Register<TContext, TResolve>(DIContainer parent_container = null)
+			where TContext : IDIContext
 			where TResolve : class
 		{
 			var context = Activator.CreateInstance<TContext>();
+			var container = new DIContainer(parent_container);
 
-			var container = new DIContainer();
-			
 			context.InstallBindings(container);
-			
 			container.Build();
 
-			return container.Resolve<TResolve>();
+			var instance = container.Resolve<TResolve>();
+			return (container, instance);
 		}
 	}
 }

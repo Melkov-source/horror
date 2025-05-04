@@ -13,9 +13,22 @@ namespace Code.DI
 
 		private readonly HashSet<Type> _types_instances = new();
 
+		private readonly DIContainer _parent_container;
+
+		public Graph(DIContainer parent_container = null)
+		{
+			_parent_container = parent_container;
+		}
+
 		public void Register(BindInfo bind_info)
 		{
 			if (bind_info.Instance != null)
+			{
+				_types_instances.Add(bind_info.Type);
+				return;
+			}
+
+			if (_parent_container?.TryResolve(bind_info.Type, out _) ?? false)
 			{
 				_types_instances.Add(bind_info.Type);
 				return;
@@ -294,6 +307,12 @@ namespace Code.DI
 		{
 			if (_types_instances.Contains(type))
 			{
+				return;
+			}
+			
+			if (_parent_container?.TryResolve(type, out _) ?? false)
+			{
+				_types_instances.Add(type);
 				return;
 			}
 			

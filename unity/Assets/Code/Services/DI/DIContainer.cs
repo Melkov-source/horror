@@ -12,27 +12,34 @@ using JetBrains.Annotations;
  */
 namespace Code.DI
 {
-    public class DIContainer
+    public class DIContainer : IDisposable
     {
-        private readonly DIContainer _parent_container;
+        [CanBeNull] private readonly DIContainer _parent_container;
         private readonly List<DIContainer> _sub_containers = new();
-        
-        
-        private readonly Graph _graph = new();
+
+
+        private readonly Graph _graph;
         private readonly List<IDIDependency> _dependencies;
 
         private readonly Dictionary<Type, object> _instances;
 
-        public DIContainer()
+        public DIContainer(DIContainer parent_container = null)
         {
+            _parent_container = parent_container;
+
+            _graph = new Graph(parent_container);
+            
             _dependencies = new List<IDIDependency>();
             _instances = new Dictionary<Type, object>();
             
             var type = typeof(DIContainer);
             var dependency = new DIDependency<DIContainer>(type);
             
+            dependency
+                .FromInstance(this)
+                .AsSingleton();
+            
             _dependencies.Add(dependency);
-            _instances.Add(type, this);
         }
         
         public IDIDependency<TType> Bind<TType>()
@@ -78,7 +85,12 @@ namespace Code.DI
                 
                 var dependency = sort_dependencies[index_1];
 
-                if (_instances.ContainsKey(dependency))
+                if (_parent_container?.Resolve(dependency) != null)
+                {
+                    continue;
+                }
+                    
+                if (Resolve(dependency) != null)
                 {
                     continue;
                 }
@@ -104,15 +116,25 @@ namespace Code.DI
             }
         }
 
+        public bool TryResolve(Type type, out object instance)
+        {
+            instance = Resolve(type);
+            
+            return instance != null;
+        }
+
+        [CanBeNull]
+        public object Resolve(Type type)
+        {
+            return _instances.GetValueOrDefault(type);
+        }
+
         [CanBeNull]
         public TType Resolve<TType>() where TType : class
         {
             var type = typeof(TType);
 
-            if (_instances.TryGetValue(type, out var result) == false)
-            {
-                return null;
-            }
+            var result = Resolve(type);
 
             return result as TType;
         }
@@ -175,6 +197,11 @@ namespace Code.DI
 
             return Activate(type) as TType;
         }
+        
+        public void Dispose()
+        {
+            
+        }
     
         private void InjectInternal([NotNull] in object instance, [NotNull] in Dictionary<MemberTypes, List<MemberInfo>> inject_members, params object[] custom_args)
         {
@@ -224,17 +251,30 @@ namespace Code.DI
                         {
                             var field = (FieldInfo)member;
 
-                            if (_instances.TryGetValue(field.FieldType, out var value) == false)
+                            if (field.FieldType != typeof(DIContainer))
                             {
-                                if (custom_instances.TryGetValue(field.FieldType, out value) == false)
+                                if (_parent_container?.TryResolve(field.FieldType, out var parent_value) ?? false)
                                 {
-                                    throw new Exception(
-                                        $"Unable to resolve parameter type {field.FieldType} from instance: {instance}");
+                                    field.SetValue(instance, parent_value);
+                                    break;
                                 }
                             }
-                        
-                            field.SetValue(instance, value);
-                            break;
+
+                            if (TryResolve(field.FieldType, out var value))
+                            {
+                                field.SetValue(instance, value);
+                                break;
+                            }
+                            
+                            if (custom_instances.TryGetValue(field.FieldType, out value))
+                            {
+                                field.SetValue(instance, value);
+                                break;
+                            }
+
+                            var msg = $"Unable to resolve parameter type {field.FieldType} from instance: {instance}";
+                            
+                            throw new Exception(msg);
                         }
 
                         case MemberTypes.All:
@@ -272,7 +312,16 @@ namespace Code.DI
 
                 var parameter_type = parameter.ParameterType;
 
-                if (_instances.TryGetValue(parameter_type, out var value) == false)
+                if (parameter_type != typeof(DIContainer))
+                {
+                    if (_parent_container?.TryResolve(parameter_type, out var parent_value) ?? false)
+                    {
+                        args[index_3] = parent_value;
+                        continue;
+                    }
+                }
+
+                if (TryResolve(parameter_type, out var value) == false)
                 {
                     if (custom_instances.TryGetValue(parameter_type, out value) == false)
                     {

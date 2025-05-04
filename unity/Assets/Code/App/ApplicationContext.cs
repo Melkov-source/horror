@@ -12,7 +12,7 @@ namespace Code.App
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		private static void OnLoad()
 		{
-			var application = DIContext.Register<ApplicationContext, Application>();
+			var (container, application) = DIContext.Register<ApplicationContext, Application>();
 
 			application.Main();
 		}
@@ -38,6 +38,18 @@ namespace Code.App
 			container
 				.Bind<Application.MonoHeart>()
 				.FromInstance(mono_heart)
+				.AsSingleton();
+			
+			var panel_manager = new PanelManager.PanelManager
+			(
+				new PanelControllerFactory(),
+				new AddressablesPanelFactory(),
+				null
+			);
+			
+			container
+				.Bind<PanelManager.PanelManager>()
+				.FromInstance(panel_manager)
 				.AsSingleton();
 		}
 	}

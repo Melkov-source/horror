@@ -9,6 +9,11 @@ namespace Code.Menu
 	public class MenuScope : IScope
 	{
 		[Inject] private readonly PanelManager.PanelManager _panel_manager;
+
+		public MenuScope(DIContainer container)
+		{
+			Debug.Log(container);
+		}
 		
 		public async UniTask InitializeAsync(CancellationToken token)
 		{

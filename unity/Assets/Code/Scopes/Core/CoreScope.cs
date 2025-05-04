@@ -1,11 +1,16 @@
 ﻿using System.Threading;
+using Code.Core.Chapters;
 using Code.Shared;
 using Cysharp.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace Code.Core
 {
+	[UsedImplicitly]
 	public class CoreScope : IScope
 	{
+		private IChapter _chapter;
+		
 		public async UniTask InitializeAsync(CancellationToken token)
 		{
 			/*
