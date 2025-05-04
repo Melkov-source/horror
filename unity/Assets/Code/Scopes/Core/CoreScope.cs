@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using Code.Core.Chapters;
 using Code.Core.Character;
+using Code.Core.Dialogue;
 using Code.Core.HUD;
 using Code.DI;
 using Code.PanelManager;
@@ -50,6 +51,10 @@ namespace Code.Core
 
 			var hud = _panel_manager.LoadPanel<HUDPanelController>();
 			hud.Open();
+			
+			var dialogue = _panel_manager.LoadPanel<DialoguePanelController>();
+			
+			dialogue.Open();
 		}
 
 		public async UniTask DisposeAsync(CancellationToken token)

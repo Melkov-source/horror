@@ -3,9 +3,9 @@ using Code.Core.Dialogue;
 
 namespace Code.Core.NPC
 {
-	public class MomNPC
+	public class MomNPC : NPCBase
 	{
-		public List<DialogueBase> dialogues = new()
+		public override List<DialogueBase> dialogues => new()
 		{
 			new MomDialogue_001(),
 		};

@@ -6,7 +6,7 @@ using Code.Core.Dialogue;
 namespace Code.Core.NPC
 {
 	[SuppressMessage("ReSharper", "InconsistentNaming")]
-	public class MomDialogue_001 : Dialogue.DialogueBase
+	public class MomDialogue_001 : DialogueBase
 	{
 		public override NPCType type => NPCType.MOM;
 
