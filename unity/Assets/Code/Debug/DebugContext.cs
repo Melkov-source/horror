@@ -2,23 +2,19 @@
 using Code.PanelManager;
 using JetBrains.Annotations;
 
-namespace Code.Menu
+namespace Code.Debug
 {
 	[UsedImplicitly]
-	public class MenuContext : IDIContext
+	public class DebugContext : IDIContext
 	{
 		public void InstallBindings(DIContainer container)
 		{
-			container
-				.Bind<MenuScope>()
-				.AsSingleton();
-			
 			var panel_manager = new PanelManager.PanelManager
 			(
 				new DIPanelControllerFactory(container),
 				new AddressablesPanelFactory(),
 				null,
-				"Menu"
+				"Debug"
 			);
 			
 			container

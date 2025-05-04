@@ -96,11 +96,20 @@ namespace Code.PanelManager
             graphicRaycaster.ignoreReversedGraphics = settings.IgnoreReversedGraphics;
             graphicRaycaster.blockingObjects = settings.BlockingObjects;
 
-            if (_eventSystem == default)
+            if (_eventSystem == null)
             {
-                var eventSystemInstance = CreateEventSystemInternal();
+                if (EventSystem.current == null)
+                {
+                    var eventSystemInstance = CreateEventSystemInternal();
                 
-                eventSystemInstance.transform.SetParent(instance.transform);
+                    eventSystemInstance.transform.SetParent(instance.transform);
+
+                    _eventSystem = eventSystemInstance;
+                }
+                else
+                {
+                    _eventSystem = EventSystem.current;
+                }
             }
 
             Object.DontDestroyOnLoad(instance);

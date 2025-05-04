@@ -30,7 +30,7 @@ namespace Code.PanelManager
 
         #region Initialize
 
-        public PanelManager(IPanelControllerFactory panel_controller_factory, IPanelFactory panel_factory, PanelDispatcher dispatcher)
+        public PanelManager(IPanelControllerFactory panel_controller_factory, IPanelFactory panel_factory, PanelDispatcher dispatcher, string tag)
         {
             _panel_controller_factory = panel_controller_factory;
             _panel_factory = panel_factory;
@@ -41,6 +41,8 @@ namespace Code.PanelManager
             }
 
             this.dispatcher = dispatcher;
+
+            this.dispatcher.gameObject.name = $"[{tag}] {this.dispatcher.gameObject.name}";
         }
 
         #endregion

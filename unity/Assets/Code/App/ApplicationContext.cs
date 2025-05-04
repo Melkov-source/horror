@@ -1,6 +1,6 @@
-﻿using Code.DI;
+﻿using Code.Debug;
+using Code.DI;
 using Code.Input;
-using Code.PanelManager;
 using Code.Shared;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -14,8 +14,10 @@ namespace Code.App
 		private static void OnLoad()
 		{
 			var (container, application) = DIContext.Register<ApplicationContext, Application>();
+			
+			DIContext.Register<DebugContext>(container);
 
-			application.Main();
+			application.Start();
 		}
 		
 		public void InstallBindings(DIContainer container)

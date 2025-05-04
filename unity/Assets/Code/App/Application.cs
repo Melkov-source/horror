@@ -1,4 +1,5 @@
-﻿using Code.DI;
+﻿using Code.Debug.Console;
+using Code.DI;
 using Code.Input;
 using Code.Shared;
 using Cysharp.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace Code.App
 			_input = input;
 		}
 
-		public void Main()
+		public void Start()
 		{
 			_input.Enable();
 			

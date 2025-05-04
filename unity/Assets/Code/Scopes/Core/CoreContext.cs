@@ -17,7 +17,8 @@ namespace Code.Core
 			(
 				new DIPanelControllerFactory(container),
 				new AddressablesPanelFactory(),
-				null
+				null,
+				"Core"
 			);
 			
 			container
