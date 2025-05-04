@@ -1,4 +1,5 @@
-﻿using Code.DI;
+﻿using System;
+using Code.DI;
 using Code.Input;
 using UnityEngine;
 
@@ -32,6 +33,8 @@ namespace Code.Core.Character
 		private Vector2 _camera_velocity;
 		private Vector2 _camera_frame_velocity;
 
+		private CharacterInteractive _interactive;
+
 		#endregion
 
 		[Inject]
@@ -45,7 +48,14 @@ namespace Code.Core.Character
 			Cursor.visible = false;
 			Cursor.lockState = CursorLockMode.Locked;
 
+			_interactive = new CharacterInteractive(_camera, _config.interactive);
+
 			_is_initialized = true;
+		}
+
+		private void Update()
+		{
+			_interactive.Update();
 		}
 
 		private void FixedUpdate()

@@ -21,7 +21,7 @@ namespace Code.Menu
 			);
 			
 			container
-				.Bind<PanelManager.PanelManager>()
+				.Bind<IPanelManager, PanelManager.PanelManager>()
 				.FromInstance(panel_manager)
 				.AsSingleton();
 		}

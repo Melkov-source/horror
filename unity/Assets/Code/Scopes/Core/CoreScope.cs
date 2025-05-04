@@ -1,7 +1,9 @@
 ﻿using System.Threading;
 using Code.Core.Chapters;
 using Code.Core.Character;
+using Code.Core.HUD;
 using Code.DI;
+using Code.PanelManager;
 using Code.Shared;
 using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
@@ -14,12 +16,14 @@ namespace Code.Core
 	[UsedImplicitly]
 	public class CoreScope : IScope
 	{
+		private readonly IPanelManager _panel_manager;
 		private readonly DIContainer _container;
 		private IChapter _chapter;
 		
-		public CoreScope(DIContainer container)
+		public CoreScope(DIContainer container, IPanelManager panel_manager)
 		{
 			_container = container;
+			_panel_manager = panel_manager;
 		}
 		
 		public async UniTask InitializeAsync(CancellationToken token)
@@ -43,6 +47,9 @@ namespace Code.Core
 			var config = JsonConvert.DeserializeObject<CharacterConfig>(json);
 			
 			_container.Inject(character, config);
+
+			var hud = _panel_manager.LoadPanel<HUDPanelController>();
+			hud.Open();
 		}
 
 		public async UniTask DisposeAsync(CancellationToken token)

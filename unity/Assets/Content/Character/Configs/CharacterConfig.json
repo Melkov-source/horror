@@ -5,5 +5,9 @@
   "camera_sensitivity": 0.2,
   "camera_smoothing": 7,
   "camera_clamp_min": -90,
-  "camera_clamp_max": 90
+  "camera_clamp_max": 90,
+  
+  "interactive": {
+    "ray_length": 4
+  }
 }

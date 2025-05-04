@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using Code.DI;
+using Code.PanelManager;
 using Code.Shared;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -8,11 +9,12 @@ namespace Code.Menu
 {
 	public class MenuScope : IScope
 	{
-		[Inject] private readonly PanelManager.PanelManager _panel_manager;
+		private readonly IPanelManager _panel_manager;
 
-		public MenuScope(DIContainer container)
+		public MenuScope(DIContainer container, IPanelManager panel_manager)
 		{
 			Debug.Log(container);
+			_panel_manager = panel_manager;
 		}
 		
 		public async UniTask InitializeAsync(CancellationToken token)
