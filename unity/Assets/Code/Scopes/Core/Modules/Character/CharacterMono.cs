@@ -55,35 +55,29 @@ namespace Code.Core.Character
 			_input.Player.Interact.started += OnInteractStarted;
 			_interactive.on_hover += OnInteractHovered;
 
+			// ✅ Включаем интерполяцию для Rigidbody
+			_rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+
 			_is_initialized = true;
 		}
 
 		private void Update()
 		{
-			if (_is_initialized == false)
-			{
-				return;
-			}
+			if (_is_initialized == false) return;
 
 			_interactive.Update();
 		}
 
 		private void FixedUpdate()
 		{
-			if (_is_initialized == false)
-			{
-				return;
-			}
+			if (_is_initialized == false) return;
 
 			Move();
 		}
 
 		private void LateUpdate()
 		{
-			if (_is_initialized == false)
-			{
-				return;
-			}
+			if (_is_initialized == false) return;
 
 			RotationCamera();
 		}
@@ -91,40 +85,34 @@ namespace Code.Core.Character
 		private void Move()
 		{
 			var axis = _input.Player.Move.ReadValue<Vector2>();
-
 			is_running = _input.Player.Sprint.IsPressed();
 
-			var speed = is_running ? _config.speed_run : _config.speed_walk;
+			float speed = is_running ? _config.speed_run : _config.speed_walk;
 
-			var velocity = new Vector2(axis.x * speed, axis.y * speed);
+			Vector2 planarVelocity = axis * speed;
 
-			var vector = new Vector3(velocity.x, _rigidbody.linearVelocity.y, velocity.y);
+			// ✅ Учитываем текущую вертикальную скорость (прыжки, падения)
+			Vector3 targetVelocity = new Vector3(planarVelocity.x, _rigidbody.linearVelocity.y, planarVelocity.y);
 
-			var linear_velocity = transform.rotation * vector;
-
-			_rigidbody.linearVelocity = linear_velocity;
+			// ✅ Поворот игрока влияет на направление движения
+			_rigidbody.linearVelocity = transform.rotation * targetVelocity;
 		}
 
 		private void RotationCamera()
 		{
-			var axis = _input.Player.Look.ReadValue<Vector2>();
+			Vector2 axis = _input.Player.Look.ReadValue<Vector2>();
+			Vector2 rawFrameVelocity = Vector2.Scale(axis, Vector2.one * _config.camera_sensitivity);
 
-			var raw_frame_velocity = Vector2.Scale(axis, Vector2.one * _config.camera_sensitivity);
-
-			_camera_frame_velocity = Vector2.Lerp
-			(
-				_camera_frame_velocity,
-				raw_frame_velocity,
-				1 / _config.camera_smoothing
-			);
-
+			_camera_frame_velocity = Vector2.Lerp(_camera_frame_velocity, rawFrameVelocity, 1f / _config.camera_smoothing);
 			_camera_velocity += _camera_frame_velocity;
+
 			_camera_velocity.y = Mathf.Clamp(_camera_velocity.y, _config.camera_clamp_min, _config.camera_clamp_max);
 
+			// ✅ Камера вращается только по X (вверх/вниз), персонаж — по Y
 			_camera.transform.localRotation = Quaternion.AngleAxis(-_camera_velocity.y, Vector3.right);
 			transform.localRotation = Quaternion.AngleAxis(_camera_velocity.x, Vector3.up);
 		}
-		
+
 		private void OnInteractHovered(ICharacterInteractable interactable)
 		{
 			Debug.Log(interactable);

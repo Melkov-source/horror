@@ -1,9 +1,9 @@
 ﻿{
   "position_threshold": 0.01,
-  "speed_walk": 5,
-  "speed_run": 9,
-  "camera_sensitivity": 0.2,
-  "camera_smoothing": 7,
+  "speed_walk": 2,
+  "speed_run": 5,
+  "camera_sensitivity": 0.15,
+  "camera_smoothing": 9,
   "camera_clamp_min": -90,
   "camera_clamp_max": 90,
   
