@@ -1,10 +1,13 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Code.Core.Character
 {
 	public class CharacterInteractive
 	{
+		public event Action<ICharacterInteractable> on_hover;
+		
 		private readonly Camera _camera;
 		private readonly CharacterConfig.Interactive _config;
 
@@ -12,6 +15,8 @@ namespace Code.Core.Character
 		private RaycastHit _hit;
 
 		private readonly Vector2 _screen_center;
+
+		private Transform _current_interactable_transform;
 		
 		public CharacterInteractive(Camera camera, CharacterConfig.Interactive config)
 		{
@@ -24,27 +29,41 @@ namespace Code.Core.Character
 		public void Update()
 		{
 			_ray = _camera.ScreenPointToRay(_screen_center);
+
+			if (Physics.Raycast(_ray, out _hit, _config.ray_length) == false)
+			{
+				_current_interactable_transform = null;
+				return;
+			}
+
+			if (_current_interactable_transform == _hit.transform)
+			{
+				return;
+			}
 			
-			Physics.Raycast(_ray, out _hit, _config.ray_length);
+			_current_interactable_transform = _hit.transform;
+				
+			if(_hit.transform.gameObject.TryGetComponent<ICharacterInteractable>(out var interactable))
+			{
+				on_hover?.Invoke(interactable);
+			}
 		}
 
-		public bool TryInteract([CanBeNull] out ICharacterInteractable character_interactable)
+		public bool TryInteract([CanBeNull] out ICharacterInteractable interactable)
 		{
-			Debug.Log(_hit.transform);
-			
 			if (_hit.transform == null)
 			{
-				character_interactable = null;
+				interactable = null;
 				return false;
 			}
 
-			character_interactable = _hit.transform.gameObject.GetComponent<ICharacterInteractable>();
+			interactable = _hit.transform.gameObject.GetComponent<ICharacterInteractable>();
 			
-			Debug.Log(character_interactable);
+			Debug.Log(interactable);
 			
-			character_interactable?.Interact();
+			interactable?.Interact();
 			
-			return character_interactable != null;
+			return interactable != null;
 		}
 	}
 }

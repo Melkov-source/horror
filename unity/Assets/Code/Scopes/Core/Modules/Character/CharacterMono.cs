@@ -53,6 +53,7 @@ namespace Code.Core.Character
 			_interactive = new CharacterInteractive(_camera, _config.interactive);
 
 			_input.Player.Interact.started += OnInteractStarted;
+			_interactive.on_hover += OnInteractHovered;
 
 			_is_initialized = true;
 		}
@@ -122,6 +123,11 @@ namespace Code.Core.Character
 
 			_camera.transform.localRotation = Quaternion.AngleAxis(-_camera_velocity.y, Vector3.right);
 			transform.localRotation = Quaternion.AngleAxis(_camera_velocity.x, Vector3.up);
+		}
+		
+		private void OnInteractHovered(ICharacterInteractable interactable)
+		{
+			Debug.Log(interactable);
 		}
 
 		private void OnInteractStarted(InputAction.CallbackContext callback)
