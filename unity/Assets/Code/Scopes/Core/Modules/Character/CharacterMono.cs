@@ -1,7 +1,8 @@
 ﻿using System;
 using Code.DI;
-using Code.Input;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using InputSystem = Code.Input.InputSystem;
 
 namespace Code.Core.Character
 {
@@ -12,7 +13,7 @@ namespace Code.Core.Character
 		public bool is_running { get; private set; }
 
 		#endregion
-		
+
 		#region serialize fields
 
 		[SerializeField] private Rigidbody _rigidbody;
@@ -28,8 +29,9 @@ namespace Code.Core.Character
 		#endregion
 
 		#region private fields
+
 		private bool _is_initialized;
-		
+
 		private Vector2 _camera_velocity;
 		private Vector2 _camera_frame_velocity;
 
@@ -41,7 +43,7 @@ namespace Code.Core.Character
 		private void Constructor(InputSystem input, CharacterConfig config)
 		{
 			input.Enable();
-			
+
 			_input = input;
 			_config = config;
 
@@ -50,11 +52,18 @@ namespace Code.Core.Character
 
 			_interactive = new CharacterInteractive(_camera, _config.interactive);
 
+			_input.Player.Interact.started += OnInteractStarted;
+
 			_is_initialized = true;
 		}
 
 		private void Update()
 		{
+			if (_is_initialized == false)
+			{
+				return;
+			}
+
 			_interactive.Update();
 		}
 
@@ -64,7 +73,7 @@ namespace Code.Core.Character
 			{
 				return;
 			}
-			
+
 			Move();
 		}
 
@@ -74,14 +83,14 @@ namespace Code.Core.Character
 			{
 				return;
 			}
-			
+
 			RotationCamera();
 		}
-		
+
 		private void Move()
 		{
 			var axis = _input.Player.Move.ReadValue<Vector2>();
-			
+
 			is_running = _input.Player.Sprint.IsPressed();
 
 			var speed = is_running ? _config.speed_run : _config.speed_walk;
@@ -103,8 +112,8 @@ namespace Code.Core.Character
 
 			_camera_frame_velocity = Vector2.Lerp
 			(
-				_camera_frame_velocity, 
-				raw_frame_velocity, 
+				_camera_frame_velocity,
+				raw_frame_velocity,
 				1 / _config.camera_smoothing
 			);
 
@@ -113,6 +122,14 @@ namespace Code.Core.Character
 
 			_camera.transform.localRotation = Quaternion.AngleAxis(-_camera_velocity.y, Vector3.right);
 			transform.localRotation = Quaternion.AngleAxis(_camera_velocity.x, Vector3.up);
+		}
+
+		private void OnInteractStarted(InputAction.CallbackContext callback)
+		{
+			if (_interactive.TryInteract(out var interacted))
+			{
+				Debug.Log(interacted);
+			}
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 
 namespace Code.Core.Character
 {
@@ -9,44 +10,41 @@ namespace Code.Core.Character
 
 		private Ray _ray;
 		private RaycastHit _hit;
+
+		private readonly Vector2 _screen_center;
 		
 		public CharacterInteractive(Camera camera, CharacterConfig.Interactive config)
 		{
 			_camera = camera;
 			_config = config;
+			
+			_screen_center = new Vector2(Screen.width / 2f, Screen.height / 2f);
 		}
 
 		public void Update()
 		{
-			Ray();
-			CheckRayCast();
-		}
-		
-		private void Ray()
-		{
-			var screen = new Vector2(Screen.width / 2f, Screen.height / 2f);
-
-			_ray = _camera.ScreenPointToRay(screen);
+			_ray = _camera.ScreenPointToRay(_screen_center);
+			
+			Physics.Raycast(_ray, out _hit, _config.ray_length);
 		}
 
-		private void CheckRayCast()
+		public bool TryInteract([CanBeNull] out ICharacterInteractable character_interactable)
 		{
-			var direction = _ray.direction * _config.ray_length;
-			var point = _camera.transform.position;
+			Debug.Log(_hit.transform);
 			
-			if (Physics.Raycast(_ray, out _hit, _config.ray_length))
+			if (_hit.transform == null)
 			{
-				Debug.DrawRay(point, direction, Color.blue);
+				character_interactable = null;
+				return false;
 			}
+
+			character_interactable = _hit.transform.gameObject.GetComponent<ICharacterInteractable>();
 			
-			if(_hit.transform == null)
-			{
-				Debug.DrawRay(point, direction, Color.red);
-			}
-			else
-			{
-				Debug.DrawRay(point, direction, Color.green);
-			}
+			Debug.Log(character_interactable);
+			
+			character_interactable?.Interact();
+			
+			return character_interactable != null;
 		}
 	}
 }
