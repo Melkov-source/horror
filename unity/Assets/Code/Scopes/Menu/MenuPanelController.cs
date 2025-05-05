@@ -20,7 +20,7 @@ namespace Code.Menu
 		{
 			base.Initialize();
 			
-			Panel.new_game_button.onClick.AddListener(() =>
+			panel.new_game_button.onClick.AddListener(() =>
 			{
 				Debug.Log("New Game Button Clicked");
 				

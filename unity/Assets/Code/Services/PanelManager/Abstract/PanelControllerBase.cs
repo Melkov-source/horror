@@ -6,7 +6,7 @@ namespace Code.PanelManager
     public abstract class PanelControllerBase<TPanel> : IPanelController<TPanel>, IPanelControllerProcessor where TPanel : IPanel
     {
         ushort IPanelControllerProcessor.Hash => _hash;
-        public TPanel Panel { get; private set; }
+        public TPanel panel { get; private set; }
         protected IPanelManager Manager { get; private set; }
 
         private IPanelManagerProcessor _managerProcessor;
@@ -18,10 +18,10 @@ namespace Code.PanelManager
             _hash = GetType().GetStableHash();
         }
 
-        public void Open() => _managerProcessor.Open(this, Panel);
-        public void Close() => _managerProcessor.Close(this, Panel);
-        public void Release() => _managerProcessor.Release(this, Panel);
-        public IPanel GetPanel() => Panel;
+        public void Open() => _managerProcessor.Open(this, panel);
+        public void Close() => _managerProcessor.Close(this, panel);
+        public void Release() => _managerProcessor.Release(this, panel);
+        public IPanel GetPanel() => panel;
 
         protected virtual void OnLoad() { }
         protected virtual void Initialize() { }
@@ -50,9 +50,9 @@ namespace Code.PanelManager
                 AssetId = meta.AssetId
             };
 
-            Panel = (TPanel)_panelFactory.Create(meta);
+            panel = (TPanel)_panelFactory.Create(meta);
 
-            var processor = (IPanelProcessor)Panel;
+            var processor = (IPanelProcessor)panel;
             
             processor.Setup(info);
             
@@ -67,9 +67,9 @@ namespace Code.PanelManager
         
         void IPanelControllerProcessor.Unload()
         {
-            Panel.SetActive(false);
+            panel.SetActive(false);
 
-            var panelGameObject = Panel.GetGameObject();
+            var panelGameObject = panel.GetGameObject();
             
 #if ADDRESSABLES
             UnityEngine.AddressableAssets.Addressables.ReleaseInstance(panelGameObject);

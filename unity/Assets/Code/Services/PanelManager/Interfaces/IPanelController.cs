@@ -12,7 +12,7 @@ namespace Code.PanelManager
 
     public interface IPanelController<out TPanel> : IPanelController where TPanel : IPanel
     {
-        public TPanel Panel { get; }
+        public TPanel panel { get; }
     }
     
     public interface IPanelControllerProcessor

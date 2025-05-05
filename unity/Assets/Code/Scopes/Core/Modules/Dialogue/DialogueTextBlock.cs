@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,13 +23,39 @@ namespace Code.Core.Dialogue
 		public void OnDisable()
 		{
 			_button.onClick.RemoveListener(OnClick);
-		}
+		}	
 
-		public void SetText(DialogueNodeBase node)
+		public async UniTask Setup(DialogueNodeBase node, int ms)
 		{
 			_node = node;
+
+			_text.text = "";
+
+			if (node.text.Length <= 10)
+			{
+				ms /= 2;
+			}
+
+			var count = Mathf.CeilToInt(node.text.Length / 35f);
 			
-			_text.text = node.text;
+			Debug.Log($"L: {node.text.Length}, M: {count}");
+
+			if (count == 0)
+			{
+				count = 1;
+			}
+
+			var size = count * 60;
+			
+			GetComponent<RectTransform>().sizeDelta = new Vector2(GetComponent<RectTransform>().sizeDelta.x, size);
+
+			var time =  ms / node.text.Length;
+
+			foreach (var c in node.text)
+			{
+				_text.text += c;
+				await UniTask.Delay(time);
+			}
 		}
 
 		private void OnClick()

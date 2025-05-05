@@ -11,11 +11,11 @@ namespace Code.Core.Dialogue
 	[Panel(PanelType = PanelType.OVERLAY, Order = 1, AssetId = "Dialogue/Prefabs/DialoguePanel.prefab")]
 	public class DialoguePanelController : PanelControllerBase<DialoguePanel>
 	{
-		private GameObject _text_block_prefab;
 		private readonly ObjectPool<DialogueTextBlock> _text_block_pool;
 		private readonly List<DialogueTextBlock> _choice_text_blocks = new();
 
 		private UniTaskCompletionSource<PlayerChoiceNode> _choice_completion_source;
+		private GameObject _text_block_prefab;
 
 		public DialoguePanelController()
 		{
@@ -48,83 +48,85 @@ namespace Code.Core.Dialogue
 		{
 			Open();
 
-			for (int index = 0; index < dialogue.sequence.Count; ++index)
+			for (int index = 0, count = dialogue.sequence.Count; index < count; ++index)
 			{
-				NPCNode currentNode = dialogue.sequence[index];
+				var node = dialogue.sequence[index];
 
-				while (currentNode != null)
+				while (node != null)
 				{
-					currentNode = await ProcessNPCNode(currentNode);
+					node = await ProcessNode(node);
 				}
 			}
+
+			Close();
 		}
 
-		private async UniTask<NPCNode> ProcessNPCNode(NPCNode npc_node)
+		private async UniTask<NPCNode> ProcessNode(NPCNode npc_node)
 		{
-			// Очистка старых блоков
-			if (_choice_text_blocks.Count > 0)
-			{
-				foreach (var block in _choice_text_blocks)
-				{
-					block.on_click -= OnChoiceSelected;
-					_text_block_pool.Release(block);
-				}
-				_choice_text_blocks.Clear();
-			}
+			ClearChoices();
 
-			// Устанавливаем текст NPC
-			Panel.npc_text_block.SetText(npc_node);
+			await panel.npc_text_block.Setup(npc_node, 700);
 
-			// Создаём completion source ДО создания кнопок
 			_choice_completion_source = new UniTaskCompletionSource<PlayerChoiceNode>();
 
-			// Выводим варианты выбора
+			var index = 0;
+
 			foreach (var choice in npc_node.choices)
 			{
 				var block = _text_block_pool.Get();
-				block.SetText(choice);
+				
+				block.transform.SetSiblingIndex(index);
+				
+				await block.Setup(choice, 200);
+
 				block.on_click += OnChoiceSelected;
 
-				block.transform.SetParent(Panel.choices_content, false);
 				_choice_text_blocks.Add(block);
+
+				index++;
 			}
+			
+			var selected_choice = await _choice_completion_source.Task;
 
-			// Ожидаем выбор
-			var selectedChoice = await _choice_completion_source.Task;
-
-			// Очистка (на всякий случай)
 			_choice_completion_source = null;
 
-			if (selectedChoice.next != null)
-			{
-				Debug.Log($"[Dialogue] Есть next, продолжаем...");
-				return selectedChoice.next;
-			}
-			else
-			{
-				Debug.Log($"[Dialogue] Нет next, завершаем шаг...");
-				return null;
-			}
+			return selected_choice.next;
 		}
 
 		private void OnChoiceSelected(DialogueNodeBase node)
 		{
 			var choice = (PlayerChoiceNode)node;
-			Debug.Log($"[Dialogue] Выбран выбор: {choice.text}");
 
+			ClearChoices();
+
+			_choice_completion_source?.TrySetResult(choice);
+		}
+
+		private void ClearChoices()
+		{
+			if (_choice_text_blocks.Count <= 0)
+			{
+				return;
+			}
+			
 			foreach (var block in _choice_text_blocks)
 			{
 				block.on_click -= OnChoiceSelected;
 				_text_block_pool.Release(block);
 			}
-			_choice_text_blocks.Clear();
 
-			_choice_completion_source?.TrySetResult(choice);
+			_choice_text_blocks.Clear();
 		}
 
 		private DialogueTextBlock CreateTextBlock()
 		{
-			var instance = Object.Instantiate(_text_block_prefab);
+			var instance = Object.Instantiate
+			(
+				_text_block_prefab,
+				panel.choices_content,
+				true
+			);
+
 			return instance.GetComponent<DialogueTextBlock>();
 		}
 
