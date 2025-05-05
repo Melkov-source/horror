@@ -1,8 +1,7 @@
 ﻿namespace Code.Core.Dialogue
 {
-	public class PlayerChoiceNode
+	public class PlayerChoiceNode : DialogueNodeBase
 	{
-		public string text;
 		public NPCNode next;
 
 		public PlayerChoiceNode(string text)

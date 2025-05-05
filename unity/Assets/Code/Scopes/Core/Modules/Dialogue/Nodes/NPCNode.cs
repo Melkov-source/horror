@@ -2,9 +2,8 @@
 
 namespace Code.Core.Dialogue
 {
-	public class NPCNode
+	public class NPCNode : DialogueNodeBase
 	{
-		public string text;
 		public List<PlayerChoiceNode> choices;
 
 		public NPCNode(string text)
