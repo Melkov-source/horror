@@ -1,6 +1,6 @@
 ﻿namespace Code.Shared
 {
-	public enum AppScope
+	public enum APP_SCOPE
 	{
 		MENU = 0,
 		CORE = 1

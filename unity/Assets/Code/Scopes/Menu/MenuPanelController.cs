@@ -24,7 +24,7 @@ namespace Code.Menu
 			{
 				Debug.Log("New Game Button Clicked");
 				
-				_director.ToScopeAsync(AppScope.CORE).Forget();
+				_director.ToScopeAsync(APP_SCOPE.CORE).Forget();
 			});
 		}
 	}

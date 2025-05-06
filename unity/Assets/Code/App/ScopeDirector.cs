@@ -19,10 +19,10 @@ namespace Code.App
 		private DIContainer _container;
 		
 		// TODO: Create factory class
-		private readonly Dictionary<AppScope, Func<DIContainer, (DIContainer, IScope)>> _scope_factories = new()
+		private readonly Dictionary<APP_SCOPE, Func<DIContainer, (DIContainer, IScope)>> _scope_factories = new()
 		{
-			[AppScope.MENU] = container => DIContext.Register<MenuContext, MenuScope>(container),
-			[AppScope.CORE] = container => DIContext.Register<CoreContext, CoreScope>(container),
+			[APP_SCOPE.MENU] = container => DIContext.Register<MenuContext, MenuScope>(container),
+			[APP_SCOPE.CORE] = container => DIContext.Register<CoreContext, CoreScope>(container),
 		};
 
 		public ScopeDirector(Application.MonoHeart heart, DIContainer app_container)
@@ -31,7 +31,7 @@ namespace Code.App
 			_app_container = app_container;
 		}
 		
-		public async UniTask ToScopeAsync(AppScope type)
+		public async UniTask ToScopeAsync(APP_SCOPE type)
 		{
 			if (_scope != null)
 			{

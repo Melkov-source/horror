@@ -4,6 +4,6 @@ namespace Code.Shared
 {
 	public interface IScopeDirector
 	{
-		UniTask ToScopeAsync(AppScope type);
+		UniTask ToScopeAsync(APP_SCOPE type);
 	}
 }

@@ -25,7 +25,7 @@ namespace Code.App
 			_input.Enable();
 			
 			_director
-				.ToScopeAsync(AppScope.MENU)
+				.ToScopeAsync(APP_SCOPE.MENU)
 				.Forget();
 		}
 		
