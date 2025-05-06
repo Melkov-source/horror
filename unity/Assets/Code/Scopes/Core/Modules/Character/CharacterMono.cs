@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Code.Core.Interactive;
 using Code.DI;
+using Code.PanelManager;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using InputSystem = Code.Input.InputSystem;
@@ -25,6 +27,7 @@ namespace Code.Core.Character
 
 		private InputSystem _input;
 		private CharacterConfig _config;
+		private IPanelManager _panel_manager;
 
 		#endregion
 
@@ -37,15 +40,23 @@ namespace Code.Core.Character
 
 		private CharacterInteractive _interactive;
 
+		private InfoObjectPanelController _info_object_controller;
+
 		#endregion
 
 		[Inject]
-		private void Constructor(InputSystem input, CharacterConfig config)
+		private void Constructor
+		(
+			InputSystem input, 
+			CharacterConfig config,
+			IPanelManager panel_manager
+		)
 		{
 			input.Enable();
 
 			_input = input;
 			_config = config;
+			_panel_manager = panel_manager;
 
 			Cursor.visible = false;
 			Cursor.lockState = CursorLockMode.Locked;
@@ -57,6 +68,8 @@ namespace Code.Core.Character
 
 			// ✅ Включаем интерполяцию для Rigidbody
 			_rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+
+			_info_object_controller = panel_manager.LoadPanel<InfoObjectPanelController>();
 
 			_is_initialized = true;
 		}
@@ -113,16 +126,25 @@ namespace Code.Core.Character
 			transform.localRotation = Quaternion.AngleAxis(_camera_velocity.x, Vector3.up);
 		}
 
-		private void OnInteractHovered(ICharacterInteractable interactable)
+		private void OnInteractHovered(IInteractable interactable)
 		{
 			Debug.Log(interactable);
 		}
 
 		private void OnInteractStarted(InputAction.CallbackContext callback)
 		{
-			if (_interactive.TryInteract(out var interacted))
+			if (_interactive.TryInteract(out var interacted) == false)
 			{
-				Debug.Log(interacted);
+				return;
+			}
+			
+			Debug.Log(interacted);
+
+			if (interacted is InfoObject info_object)
+			{
+				_info_object_controller
+					.StartInfo(info_object.info)
+					.Forget();
 			}
 		}
 	}

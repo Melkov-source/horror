@@ -33,8 +33,8 @@ namespace Code.Core
 		public async UniTask InitializeAsync(CancellationToken token)
 		{
 			Debug.Log("CoreScope Initialize");
-			
-			/*var character_config_text_asset = Addressables
+		
+			var character_config_text_asset = Addressables
 				.LoadAssetAsync<TextAsset>("Character/Configs/CharacterConfig.json")
 				.WaitForCompletion();
 			
@@ -50,85 +50,15 @@ namespace Code.Core
 
 			var config = JsonConvert.DeserializeObject<CharacterConfig>(json);
 			
-			_container.Inject(character, config);*/
+			_container.Inject(character, config);
 
 			var hud = _panel_manager.LoadPanel<HUDPanelController>();
 			hud.Open();
-			
-			var dialogue = _panel_manager.LoadPanel<DialoguePanelController>();
-
-			dialogue.StartDialogue(new MomDialogue_001()).Forget();
 		}
 
 		public async UniTask DisposeAsync(CancellationToken token)
 		{
 			throw new System.NotImplementedException();
 		}
-	}
-	
-	public class MomDialogue_001 : DialogueBase
-	{
-		public override NPCType type => NPCType.MOM;
-
-		public override List<Func<bool>> conditions => new();
-
-		public override List<NPCNode> sequence => new()
-		{
-			new NPCNode("...")
-			{
-				choices = new List<PlayerChoiceNode>
-				{
-					new("Ещё долго?"),
-					new("А че мы так долго едем?"),
-					new("Ёпта! Я проснулся, где мы?")
-				}
-			},
-
-			new NPCNode("Почти приехали. Ещё пару километров и будем на развилке.")
-			{
-				choices = new List<PlayerChoiceNode>
-				{
-					new("Там хоть есть интернет?")
-					{
-						next = new("хуй его знает Вася!")
-						{
-							choices = new()
-							{
-								new("эй епта, без выражений"),
-								new("пон")
-								{
-									next = new("Пошел ты!")
-									{
-										choices = new()
-										{
-											new("ок")
-										}
-									}
-								},
-								new("ну блиииин!"),
-							}
-						}
-					}
-				}
-			},
-
-			new NPCNode("Вряд ли. Но там спокойно. И деду будет приятно, что ты приехал.")
-			{
-				choices = new List<PlayerChoiceNode>
-				{
-					new("Вряд ли. Но там спокойно. И деду будет приятно, что ты приехал."),
-					new("Вряд ли. Но там спокойно. И деду будет приятно, что ты приехал."),
-					new("Вряд ли. Но там спокойно. И деду будет приятно, что ты приехал.")
-				}
-			},
-			
-			new NPCNode("Ну крышу уже починили. А вот с белками — не обещаю")
-			{
-				choices = new List<PlayerChoiceNode>
-				{
-					new("...")
-				}
-			}
-		};
 	}
 }

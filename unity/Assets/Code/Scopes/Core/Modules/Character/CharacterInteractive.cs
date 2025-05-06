@@ -1,4 +1,5 @@
 ﻿using System;
+using Code.Core.Interactive;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -6,7 +7,7 @@ namespace Code.Core.Character
 {
 	public class CharacterInteractive
 	{
-		public event Action<ICharacterInteractable> on_hover;
+		public event Action<IInteractable> on_hover;
 		
 		private readonly Camera _camera;
 		private readonly CharacterConfig.Interactive _config;
@@ -43,13 +44,13 @@ namespace Code.Core.Character
 			
 			_current_interactable_transform = _hit.transform;
 				
-			if(_hit.transform.gameObject.TryGetComponent<ICharacterInteractable>(out var interactable))
+			if(_hit.transform.gameObject.TryGetComponent<IInteractable>(out var interactable))
 			{
 				on_hover?.Invoke(interactable);
 			}
 		}
 
-		public bool TryInteract([CanBeNull] out ICharacterInteractable interactable)
+		public bool TryInteract([CanBeNull] out IInteractable interactable)
 		{
 			if (_hit.transform == null)
 			{
@@ -57,7 +58,7 @@ namespace Code.Core.Character
 				return false;
 			}
 
-			interactable = _hit.transform.gameObject.GetComponent<ICharacterInteractable>();
+			interactable = _hit.transform.gameObject.GetComponent<IInteractable>();
 			
 			Debug.Log(interactable);
 			
