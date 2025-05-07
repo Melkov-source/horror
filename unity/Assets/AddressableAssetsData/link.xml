@@ -5,6 +5,9 @@
     <type fullname="Code.Core.Dialogue.DialogueTextBlock" preserve="all" />
     <type fullname="Code.Core.HUD.HUDPanel" preserve="all" />
     <type fullname="Code.Core.Interactive.InfoObjectPanel" preserve="all" />
+    <type fullname="Code.Core.Modules.Inventory.InventoryItem" preserve="all" />
+    <type fullname="Code.Core.Modules.Inventory.InventoryPanel" preserve="all" />
+    <type fullname="Code.Core.Modules.Inventory.ItemInfo" preserve="all" />
   </assembly>
   <assembly fullname="Code.Menu, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
     <type fullname="Code.Menu.MenuPanel" preserve="all" />
@@ -57,6 +60,7 @@
   <assembly fullname="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
     <type fullname="UnityEngine.UI.Button" preserve="all" />
     <type fullname="UnityEngine.UI.ContentSizeFitter" preserve="all" />
+    <type fullname="UnityEngine.UI.HorizontalLayoutGroup" preserve="all" />
     <type fullname="UnityEngine.UI.Image" preserve="all" />
     <type fullname="UnityEngine.UI.VerticalLayoutGroup" preserve="all" />
     <type fullname="UnityEngine.UI.MaskableGraphic/CullStateChangedEvent" preserve="nothing" serialized="true" />

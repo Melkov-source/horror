@@ -11,22 +11,11 @@ namespace Code.Core.Dialogue
 	[Panel(PanelType = PanelType.OVERLAY, Order = 1, AssetId = "Dialogue/Prefabs/DialoguePanel.prefab")]
 	public class DialoguePanelController : PanelControllerBase<DialoguePanel>
 	{
-		private readonly ObjectPool<DialogueTextBlock> _text_block_pool;
+		private ObjectPool<DialogueTextBlock> _text_block_pool;
 		private readonly List<DialogueTextBlock> _choice_text_blocks = new();
 
 		private UniTaskCompletionSource<PlayerChoiceNode> _choice_completion_source;
 		private GameObject _text_block_prefab;
-
-		public DialoguePanelController()
-		{
-			_text_block_pool = new ObjectPool<DialogueTextBlock>
-			(
-				CreateTextBlock,
-				OnGetTextBlock,
-				OnReleaseTextBlock,
-				OnDestroyTextBlock
-			);
-		}
 
 		protected override void OnLoad()
 		{
@@ -35,6 +24,19 @@ namespace Code.Core.Dialogue
 			_text_block_prefab = Addressables
 				.LoadAssetAsync<GameObject>("Dialogue/Prefabs/DialogueTextBlock.prefab")
 				.WaitForCompletion();
+		}
+
+		protected override void Initialize()
+		{
+			base.Initialize();
+			
+			_text_block_pool = new ObjectPool<DialogueTextBlock>
+			(
+				CreateTextBlock,
+				OnGetTextBlock,
+				OnReleaseTextBlock,
+				OnDestroyTextBlock
+			);
 		}
 
 		protected override void OnUnload()

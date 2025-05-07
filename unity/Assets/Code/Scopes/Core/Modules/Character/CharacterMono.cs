@@ -1,4 +1,5 @@
 ﻿using Code.Core.Interactive;
+using Code.Core.Modules.Inventory;
 using Code.DI;
 using Code.PanelManager;
 using Cysharp.Threading.Tasks;
@@ -40,7 +41,10 @@ namespace Code.Core.Character
 
 		private CharacterInteractive _interactive;
 
-		private InfoObjectPanelController _info_object_controller;
+		private InfoObjectPanelController _info_object;
+		private InventoryPanelController _inventory;
+
+		private bool _is_active = true;
 
 		#endregion
 
@@ -64,12 +68,15 @@ namespace Code.Core.Character
 			_interactive = new CharacterInteractive(_camera, _config.interactive);
 
 			_input.Player.Interact.started += OnInteractStarted;
+			_input.Player.Inventory.started += OnInventoryStarted;
+			
 			_interactive.on_hover += OnInteractHovered;
 
 			// ✅ Включаем интерполяцию для Rigidbody
 			_rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
 
-			_info_object_controller = panel_manager.LoadPanel<InfoObjectPanelController>();
+			_info_object = panel_manager.LoadPanel<InfoObjectPanelController>();
+			_inventory = panel_manager.LoadPanel<InventoryPanelController>();
 
 			_is_initialized = true;
 		}
@@ -77,6 +84,8 @@ namespace Code.Core.Character
 		private void Update()
 		{
 			if (_is_initialized == false) return;
+			
+			if(_is_active == false) return;
 
 			_interactive.Update();
 		}
@@ -84,6 +93,8 @@ namespace Code.Core.Character
 		private void FixedUpdate()
 		{
 			if (_is_initialized == false) return;
+			
+			if(_is_active == false) return;
 
 			Move();
 		}
@@ -91,6 +102,8 @@ namespace Code.Core.Character
 		private void LateUpdate()
 		{
 			if (_is_initialized == false) return;
+			
+			if(_is_active == false) return;
 
 			RotationCamera();
 		}
@@ -140,11 +153,40 @@ namespace Code.Core.Character
 			
 			Debug.Log(interacted);
 
-			if (interacted is InfoObject info_object)
+			switch (interacted)
 			{
-				_info_object_controller
-					.StartInfo(info_object.info)
-					.Forget();
+				case InfoObject info_object:
+					_info_object
+						.StartInfo(info_object.info)
+						.Forget();
+					break;
+				case Item item:
+					if (_inventory.TryAddItem(item.info))
+					{
+						Debug.Log(item.info);
+						Destroy(item.gameObject);
+					}
+					break;
+			}
+		}
+
+		private void OnInventoryStarted(InputAction.CallbackContext callback)
+		{
+			if (_inventory.panel.State == PanelState.OPENED)
+			{
+				_inventory.Close();
+				
+				Cursor.visible = false;
+				Cursor.lockState = CursorLockMode.Locked;
+				_is_active = true;
+			}
+			else
+			{
+				_inventory.Open();
+				
+				Cursor.visible = true;
+				Cursor.lockState = CursorLockMode.None;
+				_is_active = false;
 			}
 		}
 	}
