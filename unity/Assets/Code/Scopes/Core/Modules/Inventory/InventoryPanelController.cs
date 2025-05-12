@@ -108,7 +108,7 @@ namespace Code.Core.Modules.Inventory
 			(
 				_inventory_item_prefab,
 				panel.items_content,
-				true
+				false
 			);
 
 			return instance.GetComponent<InventoryItem>();
