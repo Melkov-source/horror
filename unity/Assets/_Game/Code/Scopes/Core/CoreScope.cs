@@ -42,7 +42,7 @@ namespace Code.Core
 				.LoadAssetAsync<GameObject>("Character/Prefabs/Character.prefab")
 				.WaitForCompletion();
 
-			var instance = Object.Instantiate(character_prefab);
+			var instance = Object.Instantiate(character_prefab, Camera.main.transform);
 
 			var character = instance.GetComponent<CharacterMono>();
 
