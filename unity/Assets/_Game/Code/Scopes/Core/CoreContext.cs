@@ -7,8 +7,12 @@ namespace Code.Core
 	[UsedImplicitly]
 	public class CoreContext : IDIContext
 	{
+		public static DIContainer di;
+		
 		public void InstallBindings(DIContainer container)
 		{
+			di = container;
+			
 			container
 				.Bind<CoreScope>()
 				.AsSingleton();

@@ -23,7 +23,7 @@ namespace Code.Menu
 
 			var controller = _panel_manager.LoadPanel<MenuPanelController>();
 			
-			controller.Open();
+			//controller.Open();
 		}
 
 		public async UniTask DisposeAsync(CancellationToken token)
