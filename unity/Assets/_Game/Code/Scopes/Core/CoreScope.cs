@@ -34,7 +34,7 @@ namespace Code.Core
 		{
 			Debug.Log("CoreScope Initialize");
 		
-			var character_config_text_asset = Addressables
+			/*var character_config_text_asset = Addressables
 				.LoadAssetAsync<TextAsset>("Character/Configs/CharacterConfig.json")
 				.WaitForCompletion();
 			
@@ -50,7 +50,7 @@ namespace Code.Core
 
 			var config = JsonConvert.DeserializeObject<CharacterConfig>(json);
 			
-			_container.Inject(character, config);
+			_container.Inject(character, config);*/
 
 			var hud = _panel_manager.LoadPanel<HUDPanelController>();
 			hud.Open();
