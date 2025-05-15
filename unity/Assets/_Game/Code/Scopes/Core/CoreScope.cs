@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using Code.Core.Chapters;
-using Code.Core.Character;
-using Code.Core.Dialogue;
-using Code.Core.HUD;
 using Code.DI;
 using Code.PanelManager;
 using Code.Shared;
 using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using Object = UnityEngine.Object;
 
 namespace Code.Core
 {
@@ -33,27 +25,11 @@ namespace Code.Core
 		public async UniTask InitializeAsync(CancellationToken token)
 		{
 			Debug.Log("CoreScope Initialize");
-		
-			var character_config_text_asset = Addressables
-				.LoadAssetAsync<TextAsset>("Character/Configs/CharacterConfig.json")
-				.WaitForCompletion();
+
+			var chapter = new RoadChapter(_panel_manager);
+			//var chapter = new SomeChapter(_container);
 			
-			var character_prefab = Addressables
-				.LoadAssetAsync<GameObject>("Character/Prefabs/Character.prefab")
-				.WaitForCompletion();
-
-			var instance = Object.Instantiate(character_prefab, Camera.main.transform);
-
-			var character = instance.GetComponent<CharacterMono>();
-
-			var json = character_config_text_asset.text;
-
-			var config = JsonConvert.DeserializeObject<CharacterConfig>(json);
-			
-			_container.Inject(character, config);
-
-			var hud = _panel_manager.LoadPanel<HUDPanelController>();
-			hud.Open();
+			await chapter.InitializeAsync(token);
 		}
 
 		public async UniTask DisposeAsync(CancellationToken token)

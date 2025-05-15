@@ -1,7 +1,9 @@
-﻿namespace Code.Core.Chapters.Road
+﻿using UnityEngine;
+
+namespace Code.Core.Chapters.Road
 {
-	public class Car
+	public class Car : MonoBehaviour
 	{
-		
+		[field: SerializeField] public Radio radio { get; private set; }
 	}
 }
