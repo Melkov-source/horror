@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using Code.Core.Character;
 using Code.DI;
+using Code.Input;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace Code.Core.Chapters
 		}
 		public async UniTask InitializeAsync(CancellationToken token)
 		{
-			var character_config_text_asset = Addressables
+			/*var character_config_text_asset = Addressables
 				.LoadAssetAsync<TextAsset>("Character/Configs/CharacterConfig.json")
 				.WaitForCompletion();
 			
@@ -26,7 +27,9 @@ namespace Code.Core.Chapters
 				.LoadAssetAsync<GameObject>("Character/Prefabs/Character.prefab")
 				.WaitForCompletion();
 
-			var instance = Object.Instantiate(character_prefab, Camera.main.transform);
+			var point = Object.FindAnyObjectByType<PlayerSpawnPoint>();
+
+			var instance = Object.Instantiate(character_prefab, point.transform.position, Quaternion.identity);
 
 			var view = instance.GetComponent<CharacterMono>();
 
@@ -34,16 +37,20 @@ namespace Code.Core.Chapters
 
 			var config = JsonConvert.DeserializeObject<CharacterConfig>(json);
 			
-			_container.Inject(view, config);
+			_container.Inject(view, config);*/
 
-			var model = new CharacterModel();
 
-			var controller = new Player();
+			var input = _container.Resolve<InputSystem>();
+			Object.FindFirstObjectByType<PlayerView>().Initialize(input);
+
+			//var model = new CharacterModel();
+
+			//var controller = new Player();
 			
-			_container.Inject(controller, view, model);
+			//_container.Inject(controller, view, model);
 
-			await controller.LoadAsync(token);
-			await controller.InitializeAsync(token);
+			//await controller.LoadAsync(token);
+			//await controller.InitializeAsync(token);
 		}
 
 		public UniTask DisposeAsync(CancellationToken token)

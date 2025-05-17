@@ -12,7 +12,8 @@
         "Unity.ResourceManager",
         "Unity.InputSystem",
         "Code.Input",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.Cinemachine"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

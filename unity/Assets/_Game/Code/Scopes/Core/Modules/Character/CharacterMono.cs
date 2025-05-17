@@ -1,8 +1,10 @@
 ﻿using System;
 using Code.Core.Interactive;
 using Code.DI;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using InputSystem = Code.Input.InputSystem;
 
 namespace Code.Core.Character
@@ -19,6 +21,7 @@ namespace Code.Core.Character
 		#region serialize fields
 
 		[SerializeField] private Rigidbody _rigidbody;
+		[SerializeField] private CinemachineCamera _camera_cinema;
 		[SerializeField] private Camera _camera;
 
 		#endregion
@@ -119,7 +122,7 @@ namespace Code.Core.Character
 
 			_camera_velocity.y = Mathf.Clamp(_camera_velocity.y, _config.camera_clamp_min, _config.camera_clamp_max);
 
-			_camera.transform.localRotation = Quaternion.AngleAxis(-_camera_velocity.y, Vector3.right);
+			_camera_cinema.transform.localRotation = Quaternion.AngleAxis(-_camera_velocity.y, Vector3.right);
 			transform.localRotation = Quaternion.AngleAxis(_camera_velocity.x, Vector3.up);
 		}
 

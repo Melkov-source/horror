@@ -147,6 +147,11 @@ namespace Code.DI
         [CanBeNull]
         public object Resolve(Type type)
         {
+            if (_parent_container?.TryResolve(type, out var value) ?? false)
+            {
+                return value;
+            }
+            
             return _instances.GetValueOrDefault(type);
         }
 
