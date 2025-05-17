@@ -1,8 +1,6 @@
-﻿using Code.Core.Interactive;
-using Code.Core.Modules.Inventory;
+﻿using System;
+using Code.Core.Interactive;
 using Code.DI;
-using Code.PanelManager;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using InputSystem = Code.Input.InputSystem;
@@ -13,6 +11,7 @@ namespace Code.Core.Character
 	{
 		#region public fields
 
+		public Action<IInteractable> OnInteracted;
 		public bool is_running { get; private set; }
 
 		#endregion
@@ -28,11 +27,11 @@ namespace Code.Core.Character
 
 		private InputSystem _input;
 		private CharacterConfig _config;
-		private IPanelManager _panel_manager;
 
 		#endregion
 
 		#region private fields
+		
 
 		private bool _is_initialized;
 
@@ -40,9 +39,6 @@ namespace Code.Core.Character
 		private Vector2 _camera_frame_velocity;
 
 		private CharacterInteractive _interactive;
-
-		private InfoObjectPanelController _info_object;
-		private InventoryPanelController _inventory;
 
 		private bool _is_active = true;
 
@@ -52,31 +48,22 @@ namespace Code.Core.Character
 		private void Constructor
 		(
 			InputSystem input, 
-			CharacterConfig config,
-			IPanelManager panel_manager
+			CharacterConfig config
 		)
 		{
-			input.Enable();
-
 			_input = input;
+			
 			_config = config;
-			_panel_manager = panel_manager;
-
-			Cursor.visible = false;
-			Cursor.lockState = CursorLockMode.Locked;
 
 			_interactive = new CharacterInteractive(_camera, _config.interactive);
 
 			_input.Player.Interact.started += OnInteractStarted;
-			_input.Player.Inventory.started += OnInventoryStarted;
+			
 			
 			_interactive.on_hover += OnInteractHovered;
 
 			// ✅ Включаем интерполяцию для Rigidbody
 			_rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-
-			_info_object = panel_manager.LoadPanel<InfoObjectPanelController>();
-			_inventory = panel_manager.LoadPanel<InventoryPanelController>();
 
 			_is_initialized = true;
 		}
@@ -116,11 +103,9 @@ namespace Code.Core.Character
 			float speed = is_running ? _config.speed_run : _config.speed_walk;
 
 			Vector2 planarVelocity = axis * speed;
-
-			// ✅ Учитываем текущую вертикальную скорость (прыжки, падения)
+			
 			Vector3 targetVelocity = new Vector3(planarVelocity.x, _rigidbody.linearVelocity.y, planarVelocity.y);
 
-			// ✅ Поворот игрока влияет на направление движения
 			_rigidbody.linearVelocity = transform.rotation * targetVelocity;
 		}
 
@@ -134,7 +119,6 @@ namespace Code.Core.Character
 
 			_camera_velocity.y = Mathf.Clamp(_camera_velocity.y, _config.camera_clamp_min, _config.camera_clamp_max);
 
-			// ✅ Камера вращается только по X (вверх/вниз), персонаж — по Y
 			_camera.transform.localRotation = Quaternion.AngleAxis(-_camera_velocity.y, Vector3.right);
 			transform.localRotation = Quaternion.AngleAxis(_camera_velocity.x, Vector3.up);
 		}
@@ -152,42 +136,8 @@ namespace Code.Core.Character
 			}
 			
 			Debug.Log(interacted);
-
-			switch (interacted)
-			{
-				case InfoObject info_object:
-					_info_object
-						.StartInfo(info_object.info)
-						.Forget();
-					break;
-				case Item item:
-					if (_inventory.TryAddItem(item.info))
-					{
-						Debug.Log(item.info);
-						Destroy(item.gameObject);
-					}
-					break;
-			}
-		}
-
-		private void OnInventoryStarted(InputAction.CallbackContext callback)
-		{
-			if (_inventory.panel.State == PanelState.OPENED)
-			{
-				_inventory.Close();
-				
-				Cursor.visible = false;
-				Cursor.lockState = CursorLockMode.Locked;
-				_is_active = true;
-			}
-			else
-			{
-				_inventory.Open();
-				
-				Cursor.visible = true;
-				Cursor.lockState = CursorLockMode.None;
-				_is_active = false;
-			}
+			
+			OnInteracted?.Invoke(interacted);
 		}
 	}
 }

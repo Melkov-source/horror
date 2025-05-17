@@ -2,6 +2,7 @@
 {
 	public enum ITEM_TYPE
 	{
-		
+		NONE = 0,
+		CLOTHING = 1
 	}
 }

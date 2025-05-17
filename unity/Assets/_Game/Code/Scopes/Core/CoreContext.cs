@@ -1,4 +1,5 @@
-﻿using Code.DI;
+﻿using Code.Core.Modules.Freezing;
+using Code.DI;
 using Code.PanelManager;
 using JetBrains.Annotations;
 
@@ -28,6 +29,10 @@ namespace Code.Core
 			container
 				.Bind<IPanelManager, PanelManager.PanelManager>()
 				.FromInstance(panel_manager)
+				.AsSingleton();
+			
+			container
+				.Bind<TemperatureController>()
 				.AsSingleton();
 		}
 	}

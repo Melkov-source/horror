@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using _Game.Code.Scopes.Shared.Interfaces;
 using Code.DI;
 using Code.PanelManager;
 using Code.Shared;

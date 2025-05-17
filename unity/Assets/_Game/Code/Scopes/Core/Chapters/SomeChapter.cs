@@ -16,7 +16,7 @@ namespace Code.Core.Chapters
 		{
 			_container = container;
 		}
-		public UniTask InitializeAsync(CancellationToken token)
+		public async UniTask InitializeAsync(CancellationToken token)
 		{
 			var character_config_text_asset = Addressables
 				.LoadAssetAsync<TextAsset>("Character/Configs/CharacterConfig.json")
@@ -28,15 +28,22 @@ namespace Code.Core.Chapters
 
 			var instance = Object.Instantiate(character_prefab, Camera.main.transform);
 
-			var character = instance.GetComponent<CharacterMono>();
+			var view = instance.GetComponent<CharacterMono>();
 
 			var json = character_config_text_asset.text;
 
 			var config = JsonConvert.DeserializeObject<CharacterConfig>(json);
 			
-			_container.Inject(character, config);
+			_container.Inject(view, config);
+
+			var model = new CharacterModel();
+
+			var controller = new Player();
 			
-			return UniTask.CompletedTask;
+			_container.Inject(controller, view, model);
+
+			await controller.LoadAsync(token);
+			await controller.InitializeAsync(token);
 		}
 
 		public UniTask DisposeAsync(CancellationToken token)

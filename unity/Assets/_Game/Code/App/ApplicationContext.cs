@@ -1,4 +1,6 @@
-﻿using Code.Debug;
+﻿using _Game.Code.Scopes.Shared;
+using _Game.Code.Scopes.Shared.Interfaces;
+using Code.Debug;
 using Code.DI;
 using Code.Input;
 using Code.Shared;
@@ -34,12 +36,12 @@ namespace Code.App
 				.Bind<InputSystem>()
 				.AsSingleton();
 
-			var mono_heart = new GameObject("[App] [MonoHeart]").AddComponent<Application.MonoHeart>();
+			var mono_heart = new GameObject("[App] [MonoHeart]").AddComponent<MonoHeart>();
 			
 			Object.DontDestroyOnLoad(mono_heart);
 			
 			container
-				.Bind<Application.MonoHeart>()
+				.Bind<MonoHeart>()
 				.FromInstance(mono_heart)
 				.AsSingleton();
 		}

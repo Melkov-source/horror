@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using _Game.Code.Scopes.Shared;
+using _Game.Code.Scopes.Shared.Interfaces;
 using Code.Core;
 using Code.DI;
 using Code.Menu;
@@ -12,7 +14,7 @@ namespace Code.App
 	[UsedImplicitly]
 	public class ScopeDirector : IScopeDirector
 	{
-		private readonly Application.MonoHeart _heart;
+		private readonly MonoHeart _heart;
 		private readonly DIContainer _app_container;
 		
 		private IScope _scope;
@@ -25,7 +27,7 @@ namespace Code.App
 			[APP_SCOPE.CORE] = container => DIContext.Register<CoreContext, CoreScope>(container),
 		};
 
-		public ScopeDirector(Application.MonoHeart heart, DIContainer app_container)
+		public ScopeDirector(MonoHeart heart, DIContainer app_container)
 		{
 			_heart = heart;
 			_app_container = app_container;
@@ -52,7 +54,7 @@ namespace Code.App
 			_container = container;
 			_scope = scope;
 
-			_scope.InitializeAsync(_heart.destroyCancellationToken).Forget();
+			await _scope.InitializeAsync(_heart.destroyCancellationToken);
 		}
 	}
 }

@@ -4,6 +4,7 @@
 	{
 		NONE = 0,
 		USE = 1,
-		TAKE = 2
+		TAKE = 2,
+		EQUIP = 3,
 	}
 }

@@ -1,6 +1,7 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Code.Shared;
+using Cysharp.Threading.Tasks;
 
-namespace Code.Shared
+namespace _Game.Code.Scopes.Shared.Interfaces
 {
 	public interface IScopeDirector
 	{

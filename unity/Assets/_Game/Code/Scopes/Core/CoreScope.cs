@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using _Game.Code.Scopes.Shared.Interfaces;
 using Code.Core.Chapters;
 using Code.DI;
 using Code.PanelManager;
@@ -26,8 +27,8 @@ namespace Code.Core
 		{
 			Debug.Log("CoreScope Initialize");
 
-			var chapter = new RoadChapter(_panel_manager);
-			//var chapter = new SomeChapter(_container);
+			//var chapter = new RoadChapter(_panel_manager);
+			var chapter = new SomeChapter(_container);
 			
 			await chapter.InitializeAsync(token);
 		}

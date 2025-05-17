@@ -1,4 +1,5 @@
-﻿using Code.PanelManager;
+﻿using _Game.Code.Scopes.Shared.Interfaces;
+using Code.PanelManager;
 using Code.PanelManager.Attributes;
 using Code.Shared;
 using Cysharp.Threading.Tasks;

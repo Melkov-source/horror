@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 
-namespace Code.Shared
+namespace _Game.Code.Scopes.Shared.Interfaces
 {
 	public interface IScope
 	{

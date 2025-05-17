@@ -1,4 +1,6 @@
-﻿using Code.Debug.Console;
+﻿using System.Collections.Generic;
+using _Game.Code.Scopes.Shared.Interfaces;
+using Code.Debug.Console;
 using Code.DI;
 using Code.Input;
 using Code.Shared;
@@ -27,24 +29,6 @@ namespace Code.App
 			_director
 				.ToScopeAsync(APP_SCOPE.CORE)
 				.Forget();
-		}
-		
-		public class MonoHeart : MonoBehaviour
-		{
-			public void Update()
-			{
-			
-			}
-
-			public void FixedUpdate()
-			{
-			
-			}
-
-			public void LateUpdate()
-			{
-			
-			}
 		}
 	}
 }

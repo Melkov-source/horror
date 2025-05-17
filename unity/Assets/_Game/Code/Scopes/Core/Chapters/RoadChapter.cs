@@ -31,9 +31,7 @@ namespace Code.Core.Chapters
 				.ActivateAsync()
 				.ToUniTask(cancellationToken: token);
 			
-			var hud = _panel_manager.LoadPanel<HUDPanelController>();
 			
-			hud.Open();
 
 			var car = Object.FindAnyObjectByType<Car>();
 
