@@ -1,7 +1,6 @@
 ﻿using Code.Input;
 using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Code.Core.Character
 {
@@ -193,23 +192,6 @@ namespace Code.Core.Character
 			}
 			
 			return Mathf.Clamp(lf_angle, lf_min, lf_max);
-		}
-		
-		private void OnDrawGizmosSelected()
-		{
-			var transparent_green = new Color(0.0f, 1.0f, 0.0f, 0.35f);
-			var transparent_red = new Color(1.0f, 0.0f, 0.0f, 0.35f);
-
-			Gizmos.color = _grounded ? transparent_green : transparent_red;
-
-			var position = new Vector3
-			(
-				transform.position.x,
-				transform.position.y - _config.grounded_offset,
-				transform.position.z
-			);
-
-			Gizmos.DrawSphere(position, _config.grounded_radius);
 		}
 	}
 }
