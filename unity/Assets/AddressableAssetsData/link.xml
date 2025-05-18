@@ -14,6 +14,7 @@
     <type fullname="Code.Core.Character.PlayerView" preserve="all" />
     <type fullname="Code.Core.Dialogue.DialoguePanel" preserve="all" />
     <type fullname="Code.Core.Dialogue.DialogueTextBlock" preserve="all" />
+    <type fullname="Code.Core.HistoryPreview.HistoryPreviewPanel" preserve="all" />
     <type fullname="Code.Core.HUD.ColdBar" preserve="all" />
     <type fullname="Code.Core.HUD.HUDPanel" preserve="all" />
     <type fullname="Code.Core.Interactive.InfoObjectPanel" preserve="all" />

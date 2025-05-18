@@ -1,7 +1,9 @@
 ﻿using System.Threading;
 using Code.Core.Character;
+using Code.Core.HistoryPreview;
 using Code.DI;
 using Code.Input;
+using Code.PanelManager;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -49,6 +51,12 @@ namespace Code.Core.Chapters
 
 			await controller.LoadAsync(token);
 			await controller.InitializeAsync(token);
+
+			var panel_manager = _container.Resolve<IPanelManager>()!;
+
+			var p = panel_manager.LoadPanel<HistoryPreviewPanelController>();
+
+			await p.StartText("16:47\nГде-то на севере.\nДорога в деревню \"Медвежье\"");
 		}
 
 		public UniTask DisposeAsync(CancellationToken token)
