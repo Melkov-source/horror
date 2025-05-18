@@ -9,6 +9,7 @@ using UnityEngine.AddressableAssets;
 
 namespace Code.Core.Chapters
 {
+
 	public class SomeChapter : IChapter
 	{
 		private DIContainer _container;
@@ -40,8 +41,10 @@ namespace Code.Core.Chapters
 			_container.Inject(view, config);*/
 
 
+			var config = Addressables.LoadAssetAsync<PlayerConfig>("Character/Configs/PlayerConfig.asset").WaitForCompletion();
 			var input = _container.Resolve<InputSystem>();
-			Object.FindFirstObjectByType<PlayerView>().Initialize(input);
+			
+			Object.FindFirstObjectByType<PlayerView>().Initialize(config, input);
 
 			//var model = new CharacterModel();
 

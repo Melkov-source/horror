@@ -2224,23 +2224,7 @@ MonoBehaviour:
   _camera: {fileID: 1297279454}
   _character_controller: {fileID: 3407092088353147219}
   _noise: {fileID: 1011663310}
-  MoveSpeed: 4
-  SprintSpeed: 6
-  RotationSpeed: 0.15
-  SpeedChangeRate: 10
-  JumpHeight: 1.2
-  _gravity: -15
-  JumpTimeout: 0.1
-  FallTimeout: 0.15
-  Grounded: 1
-  GroundedOffset: -0.14
-  GroundedRadius: 0.5
-  GroundLayers:
-    serializedVersion: 2
-    m_Bits: 1
-  CinemachineCameraTarget: {fileID: 7043197735853404162}
-  TopClamp: 90
-  BottomClamp: -90
+  _camera_root: {fileID: 7043197735853404165}
 --- !u!1 &7043197735853404162
 GameObject:
   m_ObjectHideFlags: 0

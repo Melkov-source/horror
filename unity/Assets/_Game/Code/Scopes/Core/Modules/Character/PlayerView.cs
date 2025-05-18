@@ -10,53 +10,31 @@ namespace Code.Core.Character
 		[SerializeField] private Camera _camera;
 		[SerializeField] private CharacterController _character_controller;
 		[SerializeField] private CinemachineBasicMultiChannelPerlin _noise;
+		[SerializeField] private Transform _camera_root;
 
+		private PlayerConfig _config;
 		private InputSystem _input;
-
-		public float MoveSpeed = 4.0f;
-		public float SprintSpeed = 6.0f;
-		public float RotationSpeed = 1.0f;
-		public float SpeedChangeRate = 10.0f;
-
-		public float JumpHeight = 1.2f;
-		public float _gravity = -15.0f;
-
-		public float JumpTimeout = 0.1f;
-		public float FallTimeout = 0.15f;
-
-		public bool Grounded = true;
-		public float GroundedOffset = -0.14f;
-		public float GroundedRadius = 0.5f;
-		public LayerMask GroundLayers;
-
-		public GameObject CinemachineCameraTarget;
-		public float TopClamp = 90.0f;
-		public float BottomClamp = -90.0f;
-
-		private float _cinemachineTargetPitch;
-
-		// player
-		private float _speed;
-		private float _rotationVelocity;
-		private float _verticalVelocity;
-		private float _terminalVelocity = 53.0f;
-
-		// timeout deltatime
-		private float _jumpTimeoutDelta;
-		private float _fallTimeoutDelta;
-
-		private const float _threshold = 0.01f;
 		
 		private bool _initialized;
+		private bool _grounded = true;
+		private float _cinemachine_target_pitch;
+		private float _current_speed;
+		private float _rotation_velocity;
+		private float _vertical_velocity;
+		private float _fall_timeout_delta;
+		
+		private const float DELTA_TIME_MULTIPLIER = 1.0f;
+		private const float SPEED_OFFSET = 0.1f;
+		private const float INPUT_MAGNITUDE = 1f;
 
-		public void Initialize(InputSystem input)
+		public void Initialize(PlayerConfig config, InputSystem input)
 		{
+			_config = config;
 			_input = input;
 			
 			input.Enable();
 
-			_jumpTimeoutDelta = JumpTimeout;
-			_fallTimeoutDelta = FallTimeout;
+			_fall_timeout_delta = config.fall_timeout;
 
 			_initialized = true;
 		}
@@ -87,21 +65,19 @@ namespace Code.Core.Character
 		{
 			var look = _input.Player.Look.ReadValue<Vector2>();
 			
-			if (look.sqrMagnitude >= _threshold == false)
+			if (look.sqrMagnitude >= _config.threshold == false)
 			{
 				return;
 			}
-			
-			const float DELTA_TIME_MULTIPLIER = 1.0f;
 				
-			_cinemachineTargetPitch += -look.y * RotationSpeed * DELTA_TIME_MULTIPLIER;
-			_rotationVelocity = look.x * RotationSpeed * DELTA_TIME_MULTIPLIER;
+			_cinemachine_target_pitch += -look.y * _config.rotation_speed * DELTA_TIME_MULTIPLIER;
+			_rotation_velocity = look.x * _config.rotation_speed * DELTA_TIME_MULTIPLIER;
 
-			_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
+			_cinemachine_target_pitch = ClampAngle(_cinemachine_target_pitch, _config.bottom_clamp, _config.top_clamp);
 
-			CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
+			_camera_root.transform.localRotation = Quaternion.Euler(_cinemachine_target_pitch, 0.0f, 0.0f);
 
-			transform.Rotate(Vector3.up * _rotationVelocity);
+			transform.Rotate(Vector3.up * _rotation_velocity);
 		}
 
 		private void Move()
@@ -109,49 +85,45 @@ namespace Code.Core.Character
 			var move = _input.Player.Move.ReadValue<Vector2>();
 			var sprint = _input.Player.Sprint.IsPressed();
 			
-			var target_speed = sprint ? SprintSpeed : MoveSpeed;
-
+			var target_speed = sprint ? _config.sprint_speed : _config.move_speed;
 			
 			if (move == Vector2.zero)
 			{
 				target_speed = 0.0f;
-				_noise.FrequencyGain = 1;
-				_noise.AmplitudeGain = 1;
+				_noise.FrequencyGain = _config.default_camera_noise.frequency_gain;
+				_noise.AmplitudeGain = _config.default_camera_noise.amplitude_gain;
 			}
 			else
 			{
 				if (sprint)
 				{
-					_noise.AmplitudeGain = 2;
-					_noise.FrequencyGain = 5;
+					_noise.FrequencyGain = _config.sprint_camera_noise.frequency_gain;
+					_noise.AmplitudeGain = _config.sprint_camera_noise.amplitude_gain;
 				}
 				else
 				{
-					_noise.FrequencyGain = 3;
-					_noise.AmplitudeGain = 1;
+					_noise.FrequencyGain = _config.move_camera_noise.frequency_gain;
+					_noise.AmplitudeGain = _config.move_camera_noise.amplitude_gain;
 				}
 			}
 
 			var current_horizontal_speed = new Vector3(_character_controller.velocity.x, 0.0f, _character_controller.velocity.z).magnitude;
 
-			const float SPEED_OFFSET = 0.1f;
-			const float INPUT_MAGNITUDE = 1f;
-
 			if (current_horizontal_speed < target_speed - SPEED_OFFSET ||
 			    current_horizontal_speed > target_speed + SPEED_OFFSET)
 			{
-				_speed = Mathf.Lerp
+				_current_speed = Mathf.Lerp
 				(
 					current_horizontal_speed, 
 					target_speed * INPUT_MAGNITUDE,
-					Time.deltaTime * SpeedChangeRate
+					Time.deltaTime * _config.speed_change_rate
 				);
 
-				_speed = Mathf.Round(_speed * 1000f) / 1000f;
+				_current_speed = Mathf.Round(_current_speed * 1000f) / 1000f;
 			}
 			else
 			{
-				_speed = target_speed;
+				_current_speed = target_speed;
 			}
 
 			var input_direction = new Vector3(move.x, 0.0f, move.y).normalized;
@@ -161,8 +133,8 @@ namespace Code.Core.Character
 				input_direction = transform.right * move.x + transform.forward * move.y;
 			}
 
-			_character_controller.Move(input_direction.normalized * (_speed * Time.deltaTime) +
-			                           new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+			_character_controller.Move(input_direction.normalized * (_current_speed * Time.deltaTime) +
+			                           new Vector3(0.0f, _vertical_velocity, 0.0f) * Time.deltaTime);
 		}
 
 		private void GroundedCheck()
@@ -170,43 +142,41 @@ namespace Code.Core.Character
 			var sphere_position = new Vector3
 			(
 				transform.position.x,
-				transform.position.y - GroundedOffset,
+				transform.position.y - _config.grounded_offset,
 				transform.position.z
 			);
 
-			Grounded = Physics.CheckSphere
+			_grounded = Physics.CheckSphere
 			(
 				sphere_position, 
-				GroundedRadius, 
-				GroundLayers,
+				_config.grounded_radius, 
+				_config.ground_layers,
 				QueryTriggerInteraction.Ignore
 			);
 		}
 
 		private void Gravity()
 		{
-			if (Grounded)
+			if (_grounded)
 			{
-				_fallTimeoutDelta = FallTimeout;
+				_fall_timeout_delta = _config.fall_timeout;
 
-				if (_verticalVelocity < 0.0f)
+				if (_vertical_velocity < 0.0f)
 				{
-					_verticalVelocity = -2f;
+					_vertical_velocity = -2f;
 				}
 			}
 			else
 			{
-				_jumpTimeoutDelta = JumpTimeout;
-
-				if (_fallTimeoutDelta >= 0.0f)
+				if (_fall_timeout_delta >= 0.0f)
 				{
-					_fallTimeoutDelta -= Time.deltaTime;
+					_fall_timeout_delta -= Time.deltaTime;
 				}
 			}
 
-			if (_verticalVelocity < _terminalVelocity)
+			if (_vertical_velocity < _config.terminal_velocity)
 			{
-				_verticalVelocity += _gravity * Time.deltaTime;
+				_vertical_velocity += _config.gravity * Time.deltaTime;
 			}
 		}
 		
@@ -230,16 +200,16 @@ namespace Code.Core.Character
 			var transparent_green = new Color(0.0f, 1.0f, 0.0f, 0.35f);
 			var transparent_red = new Color(1.0f, 0.0f, 0.0f, 0.35f);
 
-			Gizmos.color = Grounded ? transparent_green : transparent_red;
+			Gizmos.color = _grounded ? transparent_green : transparent_red;
 
 			var position = new Vector3
 			(
 				transform.position.x,
-				transform.position.y - GroundedOffset,
+				transform.position.y - _config.grounded_offset,
 				transform.position.z
 			);
 
-			Gizmos.DrawSphere(position, GroundedRadius);
+			Gizmos.DrawSphere(position, _config.grounded_radius);
 		}
 	}
 }
