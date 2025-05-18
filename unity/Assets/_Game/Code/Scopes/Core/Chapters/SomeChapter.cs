@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.SceneManagement;
 
 namespace Code.Core.Chapters
 {
@@ -20,40 +21,34 @@ namespace Code.Core.Chapters
 		}
 		public async UniTask InitializeAsync(CancellationToken token)
 		{
-			/*var character_config_text_asset = Addressables
-				.LoadAssetAsync<TextAsset>("Character/Configs/CharacterConfig.json")
+			var scene = Addressables
+				.LoadSceneAsync("Road/01_Road.unity", LoadSceneMode.Single, false)
 				.WaitForCompletion();
+
+			await scene
+				.ActivateAsync()
+				.ToUniTask(cancellationToken: token);
 			
 			var character_prefab = Addressables
-				.LoadAssetAsync<GameObject>("Character/Prefabs/Character.prefab")
+				.LoadAssetAsync<GameObject>("Character/Prefabs/PlayerContainer.prefab")
 				.WaitForCompletion();
 
 			var point = Object.FindAnyObjectByType<PlayerSpawnPoint>();
 
-			var instance = Object.Instantiate(character_prefab, point.transform.position, Quaternion.identity);
+			var instance = Object.Instantiate(character_prefab, Vector3.zero, Quaternion.identity);
 
-			var view = instance.GetComponent<CharacterMono>();
-
-			var json = character_config_text_asset.text;
-
-			var config = JsonConvert.DeserializeObject<CharacterConfig>(json);
+			var view = instance.GetComponentInChildren<PlayerView>();
 			
-			_container.Inject(view, config);*/
-
-
-			var config = Addressables.LoadAssetAsync<PlayerConfig>("Character/Configs/PlayerConfig.asset").WaitForCompletion();
-			var input = _container.Resolve<InputSystem>();
+			view.transform.position = point.transform.position;
 			
-			Object.FindFirstObjectByType<PlayerView>().Initialize(config, input);
+			var model = new PlayerModel();
 
-			//var model = new CharacterModel();
-
-			//var controller = new Player();
+			var controller = new Player();
 			
-			//_container.Inject(controller, view, model);
+			_container.Inject(controller, view, model);
 
-			//await controller.LoadAsync(token);
-			//await controller.InitializeAsync(token);
+			await controller.LoadAsync(token);
+			await controller.InitializeAsync(token);
 		}
 
 		public UniTask DisposeAsync(CancellationToken token)

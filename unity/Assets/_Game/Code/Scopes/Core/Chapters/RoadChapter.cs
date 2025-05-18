@@ -30,8 +30,6 @@ namespace Code.Core.Chapters
 			await _scene
 				.ActivateAsync()
 				.ToUniTask(cancellationToken: token);
-			
-			
 
 			var car = Object.FindAnyObjectByType<Car>();
 

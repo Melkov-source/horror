@@ -28,7 +28,7 @@ namespace Code.Core.Character
 		[field: SerializeField] public CameraNoiseInfo default_camera_noise { get; private set; }
 		[field: SerializeField] public CameraNoiseInfo sprint_camera_noise { get; private set; }
 		[field: SerializeField] public CameraNoiseInfo move_camera_noise { get; private set; }
-		
+		[field: SerializeField] public float ray_length { get; private set; } = 4f;
 		
 		
 		[Serializable]

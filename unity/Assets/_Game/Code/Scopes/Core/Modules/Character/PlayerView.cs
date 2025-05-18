@@ -6,6 +6,8 @@ namespace Code.Core.Character
 {
 	public class PlayerView : MonoBehaviour
 	{
+		public Camera camera => _camera;
+		
 		[SerializeField] private Camera _camera;
 		[SerializeField] private CharacterController _character_controller;
 		[SerializeField] private CinemachineBasicMultiChannelPerlin _noise;
@@ -30,8 +32,6 @@ namespace Code.Core.Character
 		{
 			_config = config;
 			_input = input;
-			
-			input.Enable();
 
 			_fall_timeout_delta = config.fall_timeout;
 

@@ -13,14 +13,12 @@ namespace Code.Core
 	[UsedImplicitly]
 	public class CoreScope : IScope
 	{
-		private readonly IPanelManager _panel_manager;
 		private readonly DIContainer _container;
 		private IChapter _chapter;
 		
-		public CoreScope(DIContainer container, IPanelManager panel_manager)
+		public CoreScope(DIContainer container)
 		{
 			_container = container;
-			_panel_manager = panel_manager;
 		}
 		
 		public async UniTask InitializeAsync(CancellationToken token)

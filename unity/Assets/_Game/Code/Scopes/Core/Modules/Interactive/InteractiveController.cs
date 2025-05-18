@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace Code.Core.Character
 {
-	public class CharacterInteractive
+	public class InteractiveController
 	{
 		public event Action<IInteractable> on_hover;
 		
 		private readonly Camera _camera;
-		private readonly CharacterConfig.Interactive _config;
+		private readonly PlayerConfig _config;
 
 		private Ray _ray;
 		private RaycastHit _hit;
@@ -19,7 +19,7 @@ namespace Code.Core.Character
 
 		private Transform _current_interactable_transform;
 		
-		public CharacterInteractive(Camera camera, CharacterConfig.Interactive config)
+		public InteractiveController(Camera camera, PlayerConfig config)
 		{
 			_camera = camera;
 			_config = config;

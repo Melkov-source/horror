@@ -2,11 +2,11 @@
 
 namespace Code.Core.Character
 {
-	public class CharacterModel
+	public class PlayerModel
 	{
 		public BodyTemperature body { get; private set; }
 
-		public CharacterModel()
+		public PlayerModel()
 		{
 			body = new BodyTemperature(data: new BodyTemperature.Data()
 			{
